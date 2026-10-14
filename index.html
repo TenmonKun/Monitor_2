@@ -99,7 +99,9 @@
             flex-direction: column;
             position: relative;
             overflow: hidden;
-            background-color: #030508;
+            background-color: rgba(2, 6, 14, 0.95);
+            padding: 10px;
+            gap: 6px;
         }
 
         /* 左下エリア（左右に三分割：1列目・2列目・3列目） */
@@ -329,22 +331,25 @@
 
     <style>
         :root {
-          --neon-red: #ff210c;
-          --neon-red-glow: rgba(255, 33, 12, 0.8);
+          --neon-red: #dc7f30;
+          --neon-red-glow: rgba(220, 127, 48, 0.8);
           --neon-cyan: #00f3ff;
           --neon-cyan-glow: rgba(0, 243, 255, 0.8);
           --neon-green: #00ff66;
           --neon-green-glow: rgba(0, 255, 102, 0.8);
         }
 
-        /* 左上専用にスコープを限定したindexのCSS */
         .top-left-section {
           font-family: 'Share Tech Mono', monospace;
           color: var(--neon-red);
         }
 
-        .top-left-section * {
-          box-sizing: border-box;
+        .top-left-section .map-wrapper {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          background: #030508;
         }
 
         .top-left-section .map-container-inner {
@@ -494,7 +499,7 @@
           width: 100%;
           height: 100%;
           border-radius: 50%;
-          background: conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(255, 33, 12, 0.6) 360deg);
+          background: conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(220, 127, 48, 0.6) 360deg);
           animation: radar-spin 4s linear infinite;
         }
 
@@ -505,7 +510,7 @@
           transform: translate(-50%, -50%);
           width: 70%;
           height: 70%;
-          border: 1px dashed rgba(255, 33, 12, 0.5);
+          border: 1px dashed rgba(220, 127, 48, 0.5);
           border-radius: 50%;
         }
 
@@ -515,7 +520,7 @@
           left: 0;
           width: 100%;
           height: 1px;
-          background: rgba(255, 33, 12, 0.4);
+          background: rgba(220, 127, 48, 0.4);
         }
 
         .top-left-section .radar-cross-v {
@@ -524,7 +529,7 @@
           top: 0;
           width: 1px;
           height: 100%;
-          background: rgba(255, 33, 12, 0.4);
+          background: rgba(220, 127, 48, 0.4);
         }
 
         .top-left-section .radar-blip {
@@ -601,82 +606,85 @@
 
     <!-- 左半分エリア（上下分割：左上を拡大） -->
     <div class="left-section">
-        <!-- 左上（index.html の内容をここに統合） -->
+        <!-- 左上（タイトルとindex.htmlの内容を統合） -->
         <div class="top-left-section">
-            <div id="map" class="map-container-inner"></div>
-            <div class="scanlines"></div>
+            <div class="panel-title">TACTICAL OVERLAY</div>
+            <div class="map-wrapper">
+                <div id="map" class="map-container-inner"></div>
+                <div class="scanlines"></div>
 
-            <!-- TOP CENTER PANEL -->
-            <div class="hud-element hud-top-center">
-              <span class="classified-tag">RESTRICTED</span>
-              <span class="title-text">NORAD TACTICAL OVERLAY v4.8.1</span>
-            </div>
+                <!-- TOP CENTER PANEL -->
+                <div class="hud-element hud-top-center">
+                  <span class="classified-tag">RESTRICTED</span>
+                  <span class="title-text">NORAD TACTICAL OVERLAY v4.8.1</span>
+                </div>
 
-            <!-- TOP LEFT PANEL -->
-            <div class="hud-element hud-top-left">
-              <div class="glow-red" style="font-size: 9px; margin-top: 2px;">TARGET TRACKING PROTOCOL 0.9.4</div>
-            </div>
+                <!-- TOP LEFT PANEL -->
+                <div class="hud-element hud-top-left">
+                  <div class="glow-red" style="font-size: 9px; margin-top: 2px;">TARGET TRACKING PROTOCOL 0.9.4</div>
+                </div>
 
-            <!-- TOP RIGHT PANEL -->
-            <div class="hud-element hud-top-right">
-              <div class="glow-red" style="font-weight: bold; font-size: 10px;">
-                <span>SATELLITE CH-09</span>
-              </div>
-              <div id="utcClock" class="glow-white" style="font-size: 13px; font-weight: bold; color: #fff; margin-top: 2px;">00:00:00 UTC</div>
-              <div id="jstClock" class="glow-white" style="font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 2px;">00:00:00 JST</div>
-              <div style="font-size: 9px; color: #aaa; text-shadow: 0 0 4px #000;">LAT/LON LOG: ACTIVE</div>
-              <div class="data-stream" id="hexStream">
-                0x4F8A 0x99B2 0x11C4 0xEE7F<br>
-                0xA801 0x33F2 0x77C1 0x00FF<br>
-                0x91B3 0x88D4 0x34E0 0x12A9
-              </div>
-            </div>
+                <!-- TOP RIGHT PANEL -->
+                <div class="hud-element hud-top-right">
+                  <div class="glow-red" style="font-weight: bold; font-size: 10px;">
+                    <span>SATELLITE CH-09</span>
+                  </div>
+                  <div id="utcClock" class="glow-white" style="font-size: 13px; font-weight: bold; color: #fff; margin-top: 2px;">00:00:00 UTC</div>
+                  <div id="jstClock" class="glow-white" style="font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 2px;">00:00:00 JST</div>
+                  <div style="font-size: 9px; color: #aaa; text-shadow: 0 0 4px #000;">LAT/LON LOG: ACTIVE</div>
+                  <div class="data-stream" id="hexStream">
+                    0x4F8A 0x99B2 0x11C4 0xEE7F<br>
+                    0xA801 0x33F2 0x77C1 0x00FF<br>
+                    0x91B3 0x88D4 0x34E0 0x12A9
+                  </div>
+                </div>
 
-            <!-- BOTTOM LEFT PANEL -->
-            <div class="hud-element hud-bottom-left">
-              <div style="line-height: 1.4; font-size: 10px;">
-                <div style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; margin-top: 2px;">SATELLITE LINK: ACTIVE <span style="font-size: 8px; opacity: 0.8;">(12ms)</span></div>
-                <div class="glow-red">ENCRYPTION: <span style="color: #fff; text-shadow: 0 0 6px #fff;">AES-256-GCM</span></div>
-                <div class="glow-red">PACKETS TRACED: <span id="packetCount" style="color: #fff; text-shadow: 0 0 6px #fff;">184,920</span></div>
-                <div style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; margin-top: 2px;">HOST: 192.168.0.104 // PORT: 8080</div>
-              </div>
-            </div>
+                <!-- BOTTOM LEFT PANEL -->
+                <div class="hud-element hud-bottom-left">
+                  <div style="line-height: 1.4; font-size: 10px;">
+                    <div style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; margin-top: 2px;">SATELLITE LINK: ACTIVE <span style="font-size: 8px; opacity: 0.8;">(12ms)</span></div>
+                    <div class="glow-red">ENCRYPTION: <span style="color: #fff; text-shadow: 0 0 6px #fff;">AES-256-GCM</span></div>
+                    <div class="glow-red">PACKETS TRACED: <span id="packetCount" style="color: #fff; text-shadow: 0 0 6px #fff;">184,920</span></div>
+                    <div style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; margin-top: 2px;">HOST: 192.168.0.104 // PORT: 8080</div>
+                  </div>
+                </div>
 
-            <!-- BOTTOM RIGHT PANEL -->
-            <div class="hud-element hud-bottom-right">
-              <div class="radar-container">
-                <div class="radar-sweep"></div>
-                <div class="radar-grid"></div>
-                <div class="radar-cross-h"></div>
-                <div class="radar-cross-v"></div>
-                <div class="radar-blip" style="top: 20px; left: 45px;"></div>
-                <div class="radar-blip" style="top: 50px; left: 25px; animation-delay: 0.5s;"></div>
-              </div>
-              
-              <button class="cyber-btn" onclick="pingLocation()">
-                <span>> PING LOCATION</span>
-                <span>[F1]</span>
-              </button>
-            </div>
+                <!-- BOTTOM RIGHT PANEL -->
+                <div class="hud-element hud-bottom-right">
+                  <div class="radar-container">
+                    <div class="radar-sweep"></div>
+                    <div class="radar-grid"></div>
+                    <div class="radar-cross-h"></div>
+                    <div class="radar-cross-v"></div>
+                    <div class="radar-blip" style="top: 20px; left: 45px;"></div>
+                    <div class="radar-blip" style="top: 50px; left: 25px; animation-delay: 0.5s;"></div>
+                  </div>
+                  
+                  <button class="cyber-btn" onclick="pingLocation()">
+                    <span>> PING LOCATION</span>
+                    <span>[F1]</span>
+                  </button>
+                </div>
 
-            <!-- BOTTOM CENTER PANEL -->
-            <div class="hud-element hud-bottom-center">
-              <div class="coord-box">
-                <span class="coord-label">LATITUDE</span>
-                <span class="coord-val" id="telemetryLat">28.6139</span>
-              </div>
-              <div class="coord-box">
-                <span class="coord-label">LONGITUDE</span>
-                <span class="coord-val" id="telemetryLng">77.2090</span>
-              </div>
-              <div class="coord-box">
-                <span class="coord-label">ZOOM LEVEL</span>
-                <span class="coord-val" id="telemetryZoom">11.00</span>
-              </div>
-              <div class="coord-box">
-                <span class="coord-label">BEARING</span>
-                <span class="coord-val" id="telemetryBearing">0.0°</span>
-              </div>
+                <!-- BOTTOM CENTER PANEL -->
+                <div class="hud-element hud-bottom-center">
+                  <div class="coord-box">
+                    <span class="coord-label">LATITUDE</span>
+                    <span class="coord-val" id="telemetryLat">28.6139</span>
+                  </div>
+                  <div class="coord-box">
+                    <span class="coord-label">LONGITUDE</span>
+                    <span class="coord-val" id="telemetryLng">77.2090</span>
+                  </div>
+                  <div class="coord-box">
+                    <span class="coord-label">ZOOM LEVEL</span>
+                    <span class="coord-val" id="telemetryZoom">11.00</span>
+                  </div>
+                  <div class="coord-box">
+                    <span class="coord-label">BEARING</span>
+                    <span class="coord-val" id="telemetryBearing">0.0°</span>
+                  </div>
+                </div>
             </div>
         </div>
 
@@ -901,8 +909,8 @@
             const getY = val => paddingTop + graphHeight - ((val - 35.0) / 0.4) * graphHeight;
 
             const grad = ctx1.createLinearGradient(0, paddingTop, 0, paddingTop + graphHeight);
-            grad.addColorStop(0, 'rgba(230, 126, 34, 0.35)');
-            grad.addColorStop(1, 'rgba(230, 126, 34, 0.02)');
+            grad.addColorStop(0, 'rgba(220, 127, 48, 0.35)');
+            grad.addColorStop(1, 'rgba(220, 127, 48, 0.02)');
 
             ctx1.beginPath();
             ctx1.moveTo(getX(0), paddingTop + graphHeight);
@@ -917,7 +925,7 @@
                 const x = getX(i), y = getY(data1[i]);
                 if (i === 0) ctx1.moveTo(x, y); else ctx1.lineTo(x, y);
             }
-            ctx1.strokeStyle = '#e67e22';
+            ctx1.strokeStyle = '#dc7f30';
             ctx1.lineWidth = 1.5;
             ctx1.stroke();
         }
@@ -965,8 +973,8 @@
             const getY = val => paddingTop + graphHeight - (val / 1200) * graphHeight;
 
             const grad = ctx2.createLinearGradient(0, paddingTop, 0, paddingTop + graphHeight);
-            grad.addColorStop(0, 'rgba(230, 126, 34, 0.35)');
-            grad.addColorStop(1, 'rgba(230, 126, 34, 0.02)');
+            grad.addColorStop(0, 'rgba(220, 127, 48, 0.35)');
+            grad.addColorStop(1, 'rgba(220, 127, 48, 0.02)');
 
             ctx2.beginPath();
             ctx2.moveTo(getX(0), paddingTop + graphHeight);
@@ -981,7 +989,7 @@
                 const x = getX(i), y = getY(data2[i]);
                 if (i === 0) ctx2.moveTo(x, y); else ctx2.lineTo(x, y);
             }
-            ctx2.strokeStyle = '#e67e22';
+            ctx2.strokeStyle = '#dc7f30';
             ctx2.lineWidth = 1.5;
             ctx2.stroke();
         }
@@ -1031,8 +1039,8 @@
             const getY = val => paddingTop + graphHeight - ((val - (-120)) / 100) * graphHeight;
 
             const grad = ctx3.createLinearGradient(0, paddingTop, 0, paddingTop + graphHeight);
-            grad.addColorStop(0, 'rgba(230, 126, 34, 0.35)');
-            grad.addColorStop(1, 'rgba(230, 126, 34, 0.02)');
+            grad.addColorStop(0, 'rgba(220, 127, 48, 0.35)');
+            grad.addColorStop(1, 'rgba(220, 127, 48, 0.02)');
 
             ctx3.beginPath();
             ctx3.moveTo(getX(0), paddingTop + graphHeight);
@@ -1047,7 +1055,7 @@
                 const x = getX(i), y = getY(data3[i]);
                 if (i === 0) ctx3.moveTo(x, y); else ctx3.lineTo(x, y);
             }
-            ctx3.strokeStyle = '#e67e22';
+            ctx3.strokeStyle = '#dc7f30';
             ctx3.lineWidth = 1.5;
             ctx3.stroke();
         }
@@ -1124,7 +1132,7 @@
         function applyCustomStyles() {
             try {
                 if (map.getLayer('directions-route-line-casing')) {
-                    map.setPaintProperty('directions-route-line-casing', 'line-color', '#ff210c');
+                    map.setPaintProperty('directions-route-line-casing', 'line-color', '#dc7f30');
                     map.setPaintProperty('directions-route-line-casing', 'line-width', 14);
                     map.setPaintProperty('directions-route-line-casing', 'line-blur', 8);
                     map.setPaintProperty('directions-route-line-casing', 'line-opacity', 0.85);
@@ -1166,7 +1174,7 @@
                 pointCircleLayers.forEach(layerId => {
                     if (map.getLayer(layerId)) {
                         map.setPaintProperty(layerId, 'circle-radius', 6);
-                        map.setPaintProperty(layerId, 'circle-color', '#ff210c');
+                        map.setPaintProperty(layerId, 'circle-color', '#dc7f30');
                         map.setPaintProperty(layerId, 'circle-stroke-color', '#ffffff');
                         map.setPaintProperty(layerId, 'circle-stroke-width', 2);
                     }
