@@ -328,8 +328,8 @@
         :root {
           --neon-red: #dc7f30;
           --neon-red-glow: rgba(220, 127, 48, 0.8);
-          --neon-cyan: #00f3ff;
-          --neon-cyan-glow: rgba(0, 243, 255, 0.8);
+          --neon-cyan: #8acafd;
+          --neon-cyan-glow: rgba(138, 202, 253, 0.8);
           --neon-green: #00ff66;
           --neon-green-glow: rgba(0, 255, 102, 0.8);
         }
@@ -404,15 +404,7 @@
         }
 
         .top-left-section .classified-tag {
-          background: transparent;
-          color: var(--neon-red);
-          border: 1px solid var(--neon-red);
-          font-weight: bold;
-          padding: 2px 4px;
-          font-family: 'Orbitron', sans-serif;
-          font-size: 9px;
-          animation: blink-fast 1.5s infinite;
-          text-shadow: 0 0 6px var(--neon-red-glow);
+          display: none;
         }
 
         .top-left-section .title-text {
@@ -454,9 +446,9 @@
 
         .top-left-section .coord-val {
           font-size: 11px;
-          color: #fff;
+          color: #dc7f30;
           font-weight: bold;
-          text-shadow: 0 0 6px #fff, 0 0 10px #000;
+          text-shadow: 0 0 6px var(--neon-red-glow), 0 0 2px #000;
         }
 
         .top-left-section .hud-top-left {
@@ -483,11 +475,11 @@
           width: 70px;
           height: 70px;
           border-radius: 50%;
-          border: 1px solid var(--neon-red);
+          border: 1px solid var(--neon-cyan);
           position: relative;
           overflow: hidden;
           background: transparent;
-          box-shadow: 0 0 8px var(--neon-red-glow);
+          box-shadow: 0 0 8px var(--neon-cyan-glow);
         }
 
         .top-left-section .radar-sweep {
@@ -497,7 +489,7 @@
           width: 100%;
           height: 100%;
           border-radius: 50%;
-          background: conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(220, 127, 48, 0.6) 360deg);
+          background: conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(138, 202, 253, 0.6) 360deg);
           animation: radar-spin 4s linear infinite;
         }
 
@@ -508,7 +500,7 @@
           transform: translate(-50%, -50%);
           width: 70%;
           height: 70%;
-          border: 1px dashed rgba(220, 127, 48, 0.5);
+          border: 1px dashed rgba(138, 202, 253, 0.5);
           border-radius: 50%;
         }
 
@@ -518,7 +510,7 @@
           left: 0;
           width: 100%;
           height: 1px;
-          background: rgba(220, 127, 48, 0.4);
+          background: rgba(138, 202, 253, 0.4);
         }
 
         .top-left-section .radar-cross-v {
@@ -527,7 +519,7 @@
           top: 0;
           width: 1px;
           height: 100%;
-          background: rgba(220, 127, 48, 0.4);
+          background: rgba(138, 202, 253, 0.4);
         }
 
         .top-left-section .radar-blip {
@@ -535,7 +527,7 @@
           width: 3px;
           height: 3px;
           background: #fff;
-          box-shadow: 0 0 6px #fff, 0 0 10px var(--neon-red);
+          box-shadow: 0 0 6px #fff, 0 0 10px var(--neon-cyan);
           border-radius: 50%;
           animation: blink-fast 1s infinite alternate;
         }
@@ -589,13 +581,10 @@
 
                 <!-- TOP CENTER PANEL -->
                 <div class="hud-element hud-top-center">
-                  <span class="classified-tag">RESTRICTED</span>
-                  <!-- ORAD TACTICAL OVERLAY v4. を削除しました -->
                 </div>
 
                 <!-- TOP LEFT PANEL -->
                 <div class="hud-element hud-top-left">
-                  <div class="glow-red" style="font-size: 9px; margin-top: 2px;">TARGET TRACKING PROTOCOL 0.9.4</div>
                 </div>
 
                 <!-- TOP RIGHT PANEL -->
@@ -626,8 +615,8 @@
 
                   <div style="line-height: 1.4; font-size: 10px;">
                     <div style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; margin-top: 2px;">SATELLITE LINK: ACTIVE <span style="font-size: 8px; opacity: 0.8;">(12ms)</span></div>
-                    <div class="glow-red">ENCRYPTION: <span style="color: #fff; text-shadow: 0 0 6px #fff;">AES-256-GCM</span></div>
-                    <div class="glow-red">PACKETS TRACED: <span id="packetCount" style="color: #fff; text-shadow: 0 0 6px #fff;">184,920</span></div>
+                    <div style="color: #fff; text-shadow: 0 0 6px #fff, 0 0 2px #000;">ENCRYPTION: <span style="color: #dc7f30; text-shadow: 0 0 6px rgba(220, 127, 48, 0.8);">AES-256-GCM</span></div>
+                    <div style="color: #fff; text-shadow: 0 0 6px #fff, 0 0 2px #000;">PACKETS TRACED: <span id="packetCount" style="color: #dc7f30; text-shadow: 0 0 6px rgba(220, 127, 48, 0.8);">184,920</span></div>
                     <div style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; margin-top: 2px;">HOST: 192.168.0.104 // PORT: 8080</div>
                   </div>
                 </div>
@@ -636,20 +625,16 @@
                 <div class="hud-element hud-bottom-right">
                   <div class="coord-container">
                     <div class="coord-box">
-                      <span class="coord-label">LATITUDE</span>
-                      <span class="coord-val" id="telemetryLat">28.6377</span>
+                      <span class="coord-val"><span class="coord-label" style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; font-weight: normal;">LATITUDE: </span><span id="telemetryLat">28.6377</span></span>
                     </div>
                     <div class="coord-box">
-                      <span class="coord-label">LONGITUDE</span>
-                      <span class="coord-val" id="telemetryLng">77.2146</span>
+                      <span class="coord-val"><span class="coord-label" style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; font-weight: normal;">LONGITUDE: </span><span id="telemetryLng">77.2146</span></span>
                     </div>
                     <div class="coord-box">
-                      <span class="coord-label">ZOOM LEVEL</span>
-                      <span class="coord-val" id="telemetryZoom">14.54</span>
+                      <span class="coord-val"><span class="coord-label" style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; font-weight: normal;">ZOOM LEVEL: </span><span id="telemetryZoom">14.54</span></span>
                     </div>
                     <div class="coord-box">
-                      <span class="coord-label">BEARING</span>
-                      <span class="coord-val" id="telemetryBearing">0.0°</span>
+                      <span class="coord-val"><span class="coord-label" style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; font-weight: normal;">BEARING: </span><span id="telemetryBearing">0.0°</span></span>
                     </div>
                   </div>
                 </div>
@@ -1039,7 +1024,7 @@
             return true;
         };
 
-        mapboxgl.accessToken = 'pk.eyJ1IjoibWMxZHBiYWJnb2d1IiwiYSI6ImNtdWg0NmhhbDAxZ3YzNHBxc2R2d25pZXUifQ.jco9CKcl7GfcSr2Lh79gLA';
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWM1ZHBiYWJnb2d1IiwiYSI6ImNtdWg0NmhhbDAxZ3YzNHBxc2R2d25pZXUifQ.jco9CKcl7GfcSr2Lh79gLA';
 
         const PRIMARY_STYLE = 'mapbox://styles/mc1dpbabgogu/cmumrim97003901sl30ltg4o2';
         const FALLBACK_STYLE = 'mapbox://styles/mapbox/dark-v11';
