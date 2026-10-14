@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Monitor_2_X110(1080P)</title>
-    <!-- Mapbox GL JS CSS の読み込み -->
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
     <style>
         * {
             box-sizing: border-box;
@@ -70,6 +68,18 @@
             letter-spacing: 1px;
         }
 
+        /* プレースホルダー（空ボックス）のスタイル */
+        .placeholder-slot {
+            position: relative;
+            border: 2px solid rgba(38, 159, 251, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(38, 159, 251, 0.4);
+            font-size: 11px;
+            text-align: center;
+        }
+
         /* 1. 左側エリア（上下に二分割） */
         .left-section {
             grid-column: 1;
@@ -87,48 +97,9 @@
             border-bottom: 3px solid #0b1f3b;
             display: flex;
             flex-direction: column;
-            background-color: rgba(2, 6, 14, 0.95);
-            padding: 8px;
             position: relative;
             overflow: hidden;
-        }
-
-        /* マップのコンテナ */
-        .map-only-container {
-            position: relative;
-            background: rgba(5, 13, 26, 0.6);
-            border: 1px solid #0b1f3b;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: calc(100% - 22px);
-            margin-top: 4px;
-        }
-
-        /* Mapboxを挿入するdiv要素 */
-        #mapboxContainer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* マップ上のオーバーレイ情報 */
-        .map-overlay-info {
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            font-size: 9px;
-            color: rgba(38, 159, 251, 0.8);
-            background: rgba(1, 4, 10, 0.7);
-            padding: 2px 5px;
-            border: 1px solid #0b1f3b;
-            pointer-events: none;
-            letter-spacing: 1px;
-            z-index: 2;
+            background-color: #030508;
         }
 
         /* 左下エリア（左右に三分割：1列目・2列目・3列目） */
@@ -167,6 +138,7 @@
             gap: 4px;
         }
 
+        /* DATA PANEL と同じ .panel-title のスタイルを適用 */
         .chart-header {
             font-size: 11px;
             color: #5aaeff;
@@ -345,6 +317,279 @@
             pointer-events: none;
         }
     </style>
+
+    <!-- index.html から統合するスタイル & ライブラリ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.30.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.30.0/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.3.1/mapbox-gl-directions.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.3.1/mapbox-gl-directions.css" type="text/css">
+
+    <style>
+        :root {
+          --neon-red: #ff210c;
+          --neon-red-glow: rgba(255, 33, 12, 0.8);
+          --neon-cyan: #00f3ff;
+          --neon-cyan-glow: rgba(0, 243, 255, 0.8);
+          --neon-green: #00ff66;
+          --neon-green-glow: rgba(0, 255, 102, 0.8);
+        }
+
+        /* 左上専用にスコープを限定したindexのCSS */
+        .top-left-section {
+          font-family: 'Share Tech Mono', monospace;
+          color: var(--neon-red);
+        }
+
+        .top-left-section * {
+          box-sizing: border-box;
+        }
+
+        .top-left-section .map-container-inner {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 1;
+        }
+
+        .mapboxgl-ctrl-logo,
+        .mapboxgl-ctrl-attrib {
+          display: none !important;
+        }
+
+        .mapboxgl-ctrl-directions {
+          display: none !important;
+        }
+
+        .top-left-section .scanlines {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 10;
+          background: linear-gradient(
+            rgba(18, 16, 16, 0) 50%, 
+            rgba(0, 0, 0, 0.2) 50%
+          );
+          background-size: 100% 4px;
+          opacity: 0.5;
+        }
+
+        .top-left-section .hud-element {
+          position: absolute;
+          z-index: 20;
+          background: transparent;
+          border: none;
+          box-shadow: none;
+          padding: 0;
+          font-size: 12px;
+          letter-spacing: 1px;
+          pointer-events: auto;
+        }
+
+        .top-left-section .hud-top-center {
+          top: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          text-shadow: 0 0 6px var(--neon-red-glow);
+        }
+
+        .top-left-section .classified-tag {
+          background: transparent;
+          color: var(--neon-red);
+          border: 1px solid var(--neon-red);
+          font-weight: bold;
+          padding: 2px 4px;
+          font-family: 'Orbitron', sans-serif;
+          font-size: 9px;
+          animation: blink-fast 1.5s infinite;
+          text-shadow: 0 0 6px var(--neon-red-glow);
+        }
+
+        .top-left-section .title-text {
+          font-family: 'Orbitron', sans-serif;
+          font-weight: 700;
+          font-size: 11px;
+          color: #fff;
+          text-shadow: 0 0 8px var(--neon-red-glow), 0 0 12px var(--neon-red);
+        }
+
+        .top-left-section .hud-bottom-center {
+          bottom: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: 15px;
+          text-align: center;
+        }
+
+        .top-left-section .coord-box {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .top-left-section .coord-label {
+          font-size: 9px;
+          color: #888; 
+          text-shadow: 0 0 4px #000;
+        }
+
+        .top-left-section .coord-val {
+          font-size: 11px;
+          color: #fff;
+          font-weight: bold;
+          text-shadow: 0 0 6px #fff, 0 0 10px #000;
+        }
+
+        .top-left-section .hud-top-left {
+          top: 10px;
+          left: 10px;
+        }
+
+        .top-left-section .hud-top-right {
+          top: 10px;
+          right: 10px;
+          text-align: right;
+        }
+
+        .top-left-section .hud-bottom-left {
+          bottom: 10px;
+          left: 10px;
+          text-shadow: 0 0 5px #000;
+        }
+
+        .top-left-section .hud-bottom-right {
+          bottom: 10px;
+          right: 10px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 6px;
+        }
+
+        .top-left-section .radar-container {
+          width: 70px;
+          height: 70px;
+          border-radius: 50%;
+          border: 1px solid var(--neon-red);
+          position: relative;
+          overflow: hidden;
+          background: transparent;
+          box-shadow: 0 0 8px var(--neon-red-glow);
+        }
+
+        .top-left-section .radar-sweep {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background: conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(255, 33, 12, 0.6) 360deg);
+          animation: radar-spin 4s linear infinite;
+        }
+
+        .top-left-section .radar-grid {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 70%;
+          height: 70%;
+          border: 1px dashed rgba(255, 33, 12, 0.5);
+          border-radius: 50%;
+        }
+
+        .top-left-section .radar-cross-h {
+          position: absolute;
+          top: 50%;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background: rgba(255, 33, 12, 0.4);
+        }
+
+        .top-left-section .radar-cross-v {
+          position: absolute;
+          left: 50%;
+          top: 0;
+          width: 1px;
+          height: 100%;
+          background: rgba(255, 33, 12, 0.4);
+        }
+
+        .top-left-section .radar-blip {
+          position: absolute;
+          width: 3px;
+          height: 3px;
+          background: #fff;
+          box-shadow: 0 0 6px #fff, 0 0 10px var(--neon-red);
+          border-radius: 50%;
+          animation: blink-fast 1s infinite alternate;
+        }
+
+        .top-left-section .data-stream {
+          font-size: 9px;
+          height: 35px;
+          overflow: hidden;
+          color: #888;
+          text-shadow: 0 0 4px #000;
+          word-break: break-all;
+          line-height: 1.1;
+          text-align: right;
+          background: transparent;
+          padding: 0;
+          margin-top: 3px;
+        }
+
+        .top-left-section .cyber-btn {
+          background: transparent;
+          border: none;
+          color: var(--neon-red);
+          font-family: 'Share Tech Mono', monospace;
+          font-size: 10px;
+          padding: 3px 6px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-transform: uppercase;
+          display: flex;
+          gap: 6px;
+          text-shadow: 0 0 6px var(--neon-red-glow);
+        }
+
+        .top-left-section .cyber-btn:hover {
+          color: #fff;
+          text-shadow: 0 0 10px var(--neon-cyan), 0 0 15px var(--neon-cyan);
+        }
+
+        .top-left-section .cyber-btn:active {
+          transform: scale(0.95);
+        }
+
+        .glow-red { color: var(--neon-red); text-shadow: 0 0 6px var(--neon-red-glow), 0 0 2px #000; }
+        .glow-cyan { color: var(--neon-cyan); text-shadow: 0 0 6px var(--neon-cyan-glow), 0 0 2px #000; }
+        .glow-green { color: var(--neon-green); text-shadow: 0 0 6px var(--neon-green-glow), 0 0 2px #000; }
+        .glow-white { color: #fff; text-shadow: 0 0 6px #fff, 0 0 2px #000; }
+
+        @keyframes radar-spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
+        @keyframes blink-fast {
+          0% { opacity: 0.3; }
+          100% { opacity: 1; }
+        }
+    </style>
 </head>
 <body>
 
@@ -356,14 +601,85 @@
 
     <!-- 左半分エリア（上下分割：左上を拡大） -->
     <div class="left-section">
-        <!-- 左上：Mapbox地図組み込みエリア -->
+        <!-- 左上（index.html の内容をここに統合） -->
         <div class="top-left-section">
-            <div class="panel-title">TACTICAL MAP (MAPBOX)</div>
-            <div class="map-only-container">
-                <div class="map-overlay-info">SECTOR: 28-ALPHA / GRID-09</div>
-                <div id="mapboxContainer"></div>
+            <div id="map" class="map-container-inner"></div>
+            <div class="scanlines"></div>
+
+            <!-- TOP CENTER PANEL -->
+            <div class="hud-element hud-top-center">
+              <span class="classified-tag">RESTRICTED</span>
+              <span class="title-text">NORAD TACTICAL OVERLAY v4.8.1</span>
+            </div>
+
+            <!-- TOP LEFT PANEL -->
+            <div class="hud-element hud-top-left">
+              <div class="glow-red" style="font-size: 9px; margin-top: 2px;">TARGET TRACKING PROTOCOL 0.9.4</div>
+            </div>
+
+            <!-- TOP RIGHT PANEL -->
+            <div class="hud-element hud-top-right">
+              <div class="glow-red" style="font-weight: bold; font-size: 10px;">
+                <span>SATELLITE CH-09</span>
+              </div>
+              <div id="utcClock" class="glow-white" style="font-size: 13px; font-weight: bold; color: #fff; margin-top: 2px;">00:00:00 UTC</div>
+              <div id="jstClock" class="glow-white" style="font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 2px;">00:00:00 JST</div>
+              <div style="font-size: 9px; color: #aaa; text-shadow: 0 0 4px #000;">LAT/LON LOG: ACTIVE</div>
+              <div class="data-stream" id="hexStream">
+                0x4F8A 0x99B2 0x11C4 0xEE7F<br>
+                0xA801 0x33F2 0x77C1 0x00FF<br>
+                0x91B3 0x88D4 0x34E0 0x12A9
+              </div>
+            </div>
+
+            <!-- BOTTOM LEFT PANEL -->
+            <div class="hud-element hud-bottom-left">
+              <div style="line-height: 1.4; font-size: 10px;">
+                <div style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; margin-top: 2px;">SATELLITE LINK: ACTIVE <span style="font-size: 8px; opacity: 0.8;">(12ms)</span></div>
+                <div class="glow-red">ENCRYPTION: <span style="color: #fff; text-shadow: 0 0 6px #fff;">AES-256-GCM</span></div>
+                <div class="glow-red">PACKETS TRACED: <span id="packetCount" style="color: #fff; text-shadow: 0 0 6px #fff;">184,920</span></div>
+                <div style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; margin-top: 2px;">HOST: 192.168.0.104 // PORT: 8080</div>
+              </div>
+            </div>
+
+            <!-- BOTTOM RIGHT PANEL -->
+            <div class="hud-element hud-bottom-right">
+              <div class="radar-container">
+                <div class="radar-sweep"></div>
+                <div class="radar-grid"></div>
+                <div class="radar-cross-h"></div>
+                <div class="radar-cross-v"></div>
+                <div class="radar-blip" style="top: 20px; left: 45px;"></div>
+                <div class="radar-blip" style="top: 50px; left: 25px; animation-delay: 0.5s;"></div>
+              </div>
+              
+              <button class="cyber-btn" onclick="pingLocation()">
+                <span>> PING LOCATION</span>
+                <span>[F1]</span>
+              </button>
+            </div>
+
+            <!-- BOTTOM CENTER PANEL -->
+            <div class="hud-element hud-bottom-center">
+              <div class="coord-box">
+                <span class="coord-label">LATITUDE</span>
+                <span class="coord-val" id="telemetryLat">28.6139</span>
+              </div>
+              <div class="coord-box">
+                <span class="coord-label">LONGITUDE</span>
+                <span class="coord-val" id="telemetryLng">77.2090</span>
+              </div>
+              <div class="coord-box">
+                <span class="coord-label">ZOOM LEVEL</span>
+                <span class="coord-val" id="telemetryZoom">11.00</span>
+              </div>
+              <div class="coord-box">
+                <span class="coord-label">BEARING</span>
+                <span class="coord-val" id="telemetryBearing">0.0°</span>
+              </div>
             </div>
         </div>
+
         <!-- 左下（左右に三分割） -->
         <div class="bottom-left-section">
             <!-- SUB 1 -->
@@ -407,7 +723,7 @@
                 <video class="bg-video" src="C:\Users\y_ish\Videos\インド映画撮影データ\映像_監視カメラ\S2_04.mp4" autoplay muted loop playsinline></video>
             </div>
         </div>
-        <!-- 右下：SYSTEM DIRECTORIES -->
+        <!-- 右下：SYSTEM DIRECTORIES (ツリービューとメタデータを上から順に縦並び配置) -->
         <div class="bottom-right-section">
             <div class="inner-sidebar">
                 <div class="panel-title">NETWORK TOPOLOGY</div>
@@ -459,7 +775,7 @@
                                     <div class="tree-item"><span>[-]</span> CAM_5</div>
                                 </div>
                             </div>
-                            <!-- Sector 05 -->
+                            <!-- Sector 05 (IMPERIAL_HERITAGE: 最初からたたんだ状態) -->
                             <div class="tree-folder">
                                 <div class="tree-folder-header" onclick="toggleFolder(this)">
                                     <span>▶</span> <span>IMPERIAL_HERITAGE</span>
@@ -493,8 +809,6 @@
         </div>
     </div>
 
-    <!-- Mapbox GL JS の読み込み -->
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
     <script>
         // ツリービューのフォルダ開閉処理
         function toggleFolder(header) {
@@ -508,18 +822,6 @@
                 arrow.textContent = '▶';
             }
         }
-
-        // --- [ MAPBOX INITIALIZATION ] ---
-        // ※ 'YOUR_MAPBOX_ACCESS_TOKEN' ご自身のMapboxアクセストークンに書き換えてください
-        mapboxgl.accessToken = 'pk.eyJ1IjoibWMxZHBiYWJnb2d1IiwiYSI6ImNtdWg0NmhhbDAxZ3YzNHBxc2R2d25pZXUifQ.jco9CKcl7GfcSr2Lh79gLA';
-
-        const map = new mapboxgl.Map({
-            container: 'mapboxContainer', // 描画先の要素ID
-            style: 'mapbox://styles/mc1dpbabgogu/cmumrim97003901sl30ltg4o2', // ダーク調のタクティカルなスタイル
-            center: [77.2090, 28.6139], // 初期中心座標（例: デリー）
-            zoom: 12, // ズームレベル
-            attributionControl: true // クレジット表示の非表示（必要に応じて調整）
-        });
 
         // 共通のCanvasリサイズ関数
         function initCanvas(canvas) {
@@ -759,8 +1061,190 @@
             ctx1 = initCanvas(canvas1);
             ctx2 = initCanvas(canvas2);
             ctx3 = initCanvas(canvas3);
-            map.resize(); // ウィンドウサイズ変更時にMapboxのレイアウトを再計算
         });
+    </script>
+
+    <!-- index.html のマップ・HUD制御スクリプト -->
+    <script>
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            console.warn('Suppressed script error:', msg);
+            return true;
+        };
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWMxZHBiYWJnb2d1IiwiYSI6ImNtdWg0NmhhbDAxZ3YzNHBxc2R2d25pZXUifQ.jco9CKcl7GfcSr2Lh79gLA';
+
+        const PRIMARY_STYLE = 'mapbox://styles/mc1dpbabgogu/cmumrim97003901sl30ltg4o2';
+        const FALLBACK_STYLE = 'mapbox://styles/mapbox/dark-v11';
+
+        let map;
+        try {
+            map = new mapboxgl.Map({
+                container: 'map',
+                style: PRIMARY_STYLE,
+                projection: 'mercator',
+                zoom: 11,
+                center: [77.2090, 28.6139]
+            });
+        } catch(err) {
+            console.warn('Map initialization fallback triggered:', err);
+            map = new mapboxgl.Map({
+                container: 'map',
+                style: FALLBACK_STYLE,
+                projection: 'mercator',
+                zoom: 11,
+                center: [77.2090, 28.6139]
+            });
+        }
+
+        let styleFallbackAttempted = false;
+        map.on('error', (e) => {
+            if (!styleFallbackAttempted && e && e.error && e.error.message && 
+               (e.error.message.includes('style') || e.error.status === 401 || e.error.status === 403)) {
+                styleFallbackAttempted = true;
+                map.setStyle(FALLBACK_STYLE);
+            }
+        });
+
+        let directions;
+        try {
+            directions = new MapboxDirections({
+                accessToken: mapboxgl.accessToken,
+                unit: 'metric',
+                profile: 'mapbox/driving',
+                language: 'ja',
+                controls: {
+                    instructions: false
+                }
+            });
+            map.addControl(directions, 'top-left');
+        } catch(e) {
+            console.warn('Directions plugin failed to load:', e);
+        }
+
+        function applyCustomStyles() {
+            try {
+                if (map.getLayer('directions-route-line-casing')) {
+                    map.setPaintProperty('directions-route-line-casing', 'line-color', '#ff210c');
+                    map.setPaintProperty('directions-route-line-casing', 'line-width', 14);
+                    map.setPaintProperty('directions-route-line-casing', 'line-blur', 8);
+                    map.setPaintProperty('directions-route-line-casing', 'line-opacity', 0.85);
+                }
+                if (map.getLayer('directions-route-line-alt-casing')) {
+                    map.setPaintProperty('directions-route-line-alt-casing', 'line-color', '#00f3ff');
+                    map.setPaintProperty('directions-route-line-alt-casing', 'line-width', 12);
+                    map.setPaintProperty('directions-route-line-alt-casing', 'line-blur', 6);
+                    map.setPaintProperty('directions-route-line-alt-casing', 'line-opacity', 0.75);
+                }
+
+                if (map.getLayer('directions-route-line')) {
+                    map.setPaintProperty('directions-route-line', 'line-color', '#ffffff');
+                    map.setPaintProperty('directions-route-line', 'line-width', 3);
+                    map.setPaintProperty('directions-route-line', 'line-opacity', 1.0);
+                }
+                if (map.getLayer('directions-route-line-alt')) {
+                    map.setPaintProperty('directions-route-line-alt', 'line-color', '#ffffff');
+                    map.setPaintProperty('directions-route-line-alt', 'line-width', 2);
+                    map.setPaintProperty('directions-route-line-alt', 'line-opacity', 0.9);
+                }
+
+                const pointTextLayers = [
+                    'directions-origin-label',
+                    'directions-destination-label',
+                    'directions-waypoint-label'
+                ];
+                pointTextLayers.forEach(layerId => {
+                    if (map.getLayer(layerId)) {
+                        map.setLayoutProperty(layerId, 'text-field', '');
+                    }
+                });
+
+                const pointCircleLayers = [
+                    'directions-origin-point',
+                    'directions-destination-point',
+                    'directions-waypoint-point'
+                ];
+                pointCircleLayers.forEach(layerId => {
+                    if (map.getLayer(layerId)) {
+                        map.setPaintProperty(layerId, 'circle-radius', 6);
+                        map.setPaintProperty(layerId, 'circle-color', '#ff210c');
+                        map.setPaintProperty(layerId, 'circle-stroke-color', '#ffffff');
+                        map.setPaintProperty(layerId, 'circle-stroke-width', 2);
+                    }
+                });
+            } catch (e) {
+                console.warn('Error applying route glow styles:', e);
+            }
+        }
+
+        map.on('style.load', applyCustomStyles);
+        if (directions) {
+            directions.on('route', applyCustomStyles);
+        }
+
+        map.on('load', () => {
+            applyCustomStyles();
+            if (directions) {
+                try {
+                    directions.setOrigin([77.2090, 28.6139]);
+                    directions.setDestination([77.2300, 28.6500]);
+                } catch(e) {}
+            }
+        });
+
+        function updateTelemetry() {
+            try {
+                const center = map.getCenter();
+                const zoom = map.getZoom();
+                const bearing = map.getBearing();
+
+                document.getElementById('telemetryLat').innerText = center.lat.toFixed(4);
+                document.getElementById('telemetryLng').innerText = center.lng.toFixed(4);
+                document.getElementById('telemetryZoom').innerText = zoom.toFixed(2);
+                document.getElementById('telemetryBearing').innerText = bearing.toFixed(1) + '°';
+            } catch(e) {}
+        }
+
+        map.on('move', updateTelemetry);
+        updateTelemetry();
+
+        function updateClocks() {
+            const now = new Date();
+            document.getElementById('utcClock').innerText = now.toUTCString().split(' ')[4] + ' UTC';
+            
+            const jstString = now.toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo', hour12: false });
+            document.getElementById('jstClock').innerText = jstString + ' JST';
+        }
+        setInterval(updateClocks, 1000);
+        updateClocks();
+
+        function updateHexStream() {
+            const hexChars = '0123456789ABCDEF';
+            let result = '';
+            for (let i = 0; i < 3; i++) {
+                let line = '';
+                for (let j = 0; j < 4; j++) {
+                    line += '0x' + hexChars[Math.floor(Math.random()*16)] + hexChars[Math.floor(Math.random()*16)] + hexChars[Math.floor(Math.random()*16)] + hexChars[Math.floor(Math.random()*16)] + ' ';
+                }
+                result += line + '<br>';
+            }
+            document.getElementById('hexStream').innerHTML = result;
+        }
+        setInterval(updateHexStream, 250);
+
+        let packetCount = 184920;
+        setInterval(() => {
+            packetCount += Math.floor(Math.random() * 15) + 1;
+            document.getElementById('packetCount').innerText = packetCount.toLocaleString();
+        }, 500);
+
+        function pingLocation() {
+            const center = map.getCenter();
+            map.flyTo({
+                center: [center.lng + (Math.random() - 0.5) * 0.02, center.lat + (Math.random() - 0.5) * 0.02],
+                zoom: map.getZoom(),
+                speed: 0.8
+            });
+        }
     </script>
 </body>
 </html>
