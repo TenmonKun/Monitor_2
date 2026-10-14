@@ -615,13 +615,12 @@
 
                 <!-- TOP CENTER PANEL -->
                 <div class="hud-element hud-top-center">
-                  <span class="classified-tag">RESTRICTED</span>
-                  <span class="title-text">NORAD TACTICAL OVERLAY v4.8.1</span>
+                  <span class="title-text">ORAD TACTICAL OVERLAY v4.8</span>
                 </div>
 
                 <!-- TOP LEFT PANEL -->
                 <div class="hud-element hud-top-left">
-                  <div class="glow-red" style="font-size: 9px; margin-top: 2px;">TARGET TRACKING PROTOCOL 0.9.4</div>
+                  <!-- TARGET TRACKING PROTOCOL 0.9 を削除しました -->
                 </div>
 
                 <!-- TOP RIGHT PANEL -->
@@ -660,25 +659,22 @@
                     <div class="radar-blip" style="top: 50px; left: 25px; animation-delay: 0.5s;"></div>
                   </div>
                   
-                  <button class="cyber-btn" onclick="pingLocation()">
-                    <span>> PING LOCATION</span>
-                    <span>[F1]</span>
-                  </button>
+                  <!-- ping location ボタンを削除しました -->
                 </div>
 
                 <!-- BOTTOM CENTER PANEL -->
                 <div class="hud-element hud-bottom-center">
                   <div class="coord-box">
                     <span class="coord-label">LATITUDE</span>
-                    <span class="coord-val" id="telemetryLat">28.6139</span>
+                    <span class="coord-val" id="telemetryLat">28.6394</span>
                   </div>
                   <div class="coord-box">
                     <span class="coord-label">LONGITUDE</span>
-                    <span class="coord-val" id="telemetryLng">77.2090</span>
+                    <span class="coord-val" id="telemetryLng">77.2141</span>
                   </div>
                   <div class="coord-box">
                     <span class="coord-label">ZOOM LEVEL</span>
-                    <span class="coord-val" id="telemetryZoom">11.00</span>
+                    <span class="coord-val" id="telemetryZoom">13.26</span>
                   </div>
                   <div class="coord-box">
                     <span class="coord-label">BEARING</span>
@@ -1090,8 +1086,9 @@
                 container: 'map',
                 style: PRIMARY_STYLE,
                 projection: 'mercator',
-                zoom: 11,
-                center: [77.2090, 28.6139]
+                zoom: 13.26,
+                center: [77.2141, 28.6394],
+                bearing: 0.0
             });
         } catch(err) {
             console.warn('Map initialization fallback triggered:', err);
@@ -1099,8 +1096,9 @@
                 container: 'map',
                 style: FALLBACK_STYLE,
                 projection: 'mercator',
-                zoom: 11,
-                center: [77.2090, 28.6139]
+                zoom: 13.26,
+                center: [77.2141, 28.6394],
+                bearing: 0.0
             });
         }
 
@@ -1193,7 +1191,7 @@
             applyCustomStyles();
             if (directions) {
                 try {
-                    directions.setOrigin([77.2090, 28.6139]);
+                    directions.setOrigin([77.2141, 28.6394]);
                     directions.setDestination([77.2300, 28.6500]);
                 } catch(e) {}
             }
