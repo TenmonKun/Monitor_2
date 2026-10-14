@@ -97,6 +97,110 @@
             border-bottom: 3px solid #0b1f3b;
             display: flex;
             flex-direction: column;
+            background-color: rgba(2, 6, 14, 0.95);
+            padding: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* マップ＆インデックスのレイアウト用グリッド */
+        .map-index-container {
+            display: grid;
+            grid-template-columns: 1fr 220px;
+            gap: 8px;
+            width: 100%;
+            height: calc(100% - 22px);
+            margin-top: 4px;
+        }
+
+        /* タクティカルマップエリア */
+        .tactical-map-wrapper {
+            position: relative;
+            background: rgba(5, 13, 26, 0.6);
+            border: 1px solid #0b1f3b;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tactical-map-wrapper canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* マップ上のオーバーレイ情報 */
+        .map-overlay-info {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            font-size: 9px;
+            color: rgba(38, 159, 251, 0.8);
+            background: rgba(1, 4, 10, 0.7);
+            padding: 2px 5px;
+            border: 1px solid #0b1f3b;
+            pointer-events: none;
+            letter-spacing: 1px;
+        }
+
+        /* インデックス（ターゲットリスト）エリア */
+        .index-sidebar {
+            background: rgba(5, 13, 26, 0.7);
+            border: 1px solid #0b1f3b;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .index-header {
+            font-size: 9px;
+            color: #79cbff;
+            background: rgba(11, 31, 59, 0.4);
+            padding: 4px 6px;
+            border-bottom: 1px solid #1765c0;
+            letter-spacing: 1px;
+        }
+
+        .index-list {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            padding: 6px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .index-item {
+            display: flex;
+            flex-direction: column;
+            background: rgba(2, 6, 14, 0.8);
+            border-left: 2px solid #269ffb;
+            padding: 4px 6px;
+            font-size: 8px;
+            gap: 2px;
+            cursor: pointer;
+        }
+
+        .index-item:hover {
+            background: rgba(38, 159, 251, 0.15);
+            border-left-color: #e67e22;
+        }
+
+        .index-item-top {
+            display: flex;
+            justify-content: space-between;
+            color: #79cbff;
+            font-weight: bold;
+        }
+
+        .index-item-sub {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(38, 159, 251, 0.6);
+            font-size: 7px;
         }
 
         /* 左下エリア（左右に三分割：1列目・2列目・3列目） */
@@ -325,9 +429,42 @@
 
     <!-- 左半分エリア（上下分割：左上を拡大） -->
     <div class="left-section">
-        <!-- 左上 -->
-        <div class="placeholder-slot top-left-section">
-            <span>[ TOP LEFT SECTION ]</span>
+        <!-- 左上：タクティカルマップ ＆ インデックス -->
+        <div class="top-left-section">
+            <div class="panel-title">TACTICAL MAP & TARGET INDEX</div>
+            <div class="map-index-container">
+                <!-- マップエリア -->
+                <div class="tactical-map-wrapper">
+                    <canvas id="tacticalMapCanvas"></canvas>
+                    <div class="map-overlay-info">SECTOR: 28-ALPHA / GRID-09</div>
+                </div>
+                <!-- インデックスエリア -->
+                <div class="index-sidebar">
+                    <div class="index-header">ACTIVE TARGETS</div>
+                    <div class="index-list">
+                        <div class="index-item">
+                            <div class="index-item-top"><span>TRG-01 : JN-108</span><span style="color:#e67e22;">LOCKED</span></div>
+                            <div class="index-item-sub"><span>LAT: 35.211N</span><span>ALT: 450m</span></div>
+                        </div>
+                        <div class="index-item">
+                            <div class="index-item-top"><span>TRG-02 : JN-137</span><span style="color:#269ffb;">TRACKING</span></div>
+                            <div class="index-item-sub"><span>LAT: 35.189N</span><span>ALT: 320m</span></div>
+                        </div>
+                        <div class="index-item">
+                            <div class="index-item-top"><span>TRG-03 : CAM-13</span><span style="color:#269ffb;">TRACKING</span></div>
+                            <div class="index-item-sub"><span>LAT: 35.302N</span><span>ALT: 510m</span></div>
+                        </div>
+                        <div class="index-item">
+                            <div class="index-item-top"><span>TRG-04 : CAM-25</span><span style="color:rgba(38,159,251,0.5);">STANDBY</span></div>
+                            <div class="index-item-sub"><span>LAT: 35.045N</span><span>ALT: 180m</span></div>
+                        </div>
+                        <div class="index-item">
+                            <div class="index-item-top"><span>TRG-05 : PLAZA-01</span><span style="color:#e67e22;">LOCKED</span></div>
+                            <div class="index-item-sub"><span>LAT: 35.267N</span><span>ALT: 620m</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- 左下（左右に三分割） -->
         <div class="bottom-left-section">
@@ -372,7 +509,7 @@
                 <video class="bg-video" src="C:\Users\y_ish\Videos\インド映画撮影データ\映像_監視カメラ\S2_04.mp4" autoplay muted loop playsinline></video>
             </div>
         </div>
-        <!-- 右下：SYSTEM DIRECTORIES (ツリービューとメタデータを上から順に縦並び配置) -->
+        <!-- 右下：SYSTEM DIRECTORIES -->
         <div class="bottom-right-section">
             <div class="inner-sidebar">
                 <div class="panel-title">NETWORK TOPOLOGY</div>
@@ -421,10 +558,10 @@
                                 <div class="tree-children">
                                     <div class="tree-item"><span>[+]</span> CAM_1</div>
                                     <div class="tree-item"><span>[+]</span> CAM_4</div>
-                                    <div class="tree-item"><span>[-]</span> CAM_5</div>
+                                    <div class="tree-item"><span>[-]</span> CAM-5</div>
                                 </div>
                             </div>
-                            <!-- Sector 05 (IMPERIAL_HERITAGE: 最初からたたんだ状態) -->
+                            <!-- Sector 05 -->
                             <div class="tree-folder">
                                 <div class="tree-folder-header" onclick="toggleFolder(this)">
                                     <span>▶</span> <span>IMPERIAL_HERITAGE</span>
@@ -481,6 +618,67 @@
             ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
             return ctx;
         }
+
+        // --- [ TACTICAL MAP ] 簡易マップのアニメーション描画 ---
+        const mapCanvas = document.getElementById('tacticalMapCanvas');
+        let mapCtx = initCanvas(mapCanvas);
+        let mapAngle = 0;
+
+        function renderTacticalMap() {
+            const w = mapCanvas.clientWidth, h = mapCanvas.clientHeight;
+            mapCtx.clearRect(0, 0, w, h);
+
+            // グリッド線の描画
+            mapCtx.strokeStyle = 'rgba(38, 159, 251, 0.1)';
+            mapCtx.lineWidth = 1;
+            const step = 30;
+            for (let x = 0; x < w; x += step) {
+                mapCtx.beginPath(); mapCtx.moveTo(x, 0); mapCtx.lineTo(x, h); mapCtx.stroke();
+            }
+            for (let y = 0; y < h; y += step) {
+                mapCtx.beginPath(); mapCtx.moveTo(0, y); mapCtx.lineTo(w, y); mapCtx.stroke();
+            }
+
+            // 同心円とレーダーのターゲット
+            const cx = w / 2, cy = h / 2;
+            mapCtx.strokeStyle = 'rgba(38, 159, 251, 0.25)';
+            mapCtx.beginPath();
+            mapCtx.arc(cx, cy, 50, 0, Math.PI * 2);
+            mapCtx.arc(cx, cy, 90, 0, Math.PI * 2);
+            mapCtx.stroke();
+
+            // 回転するレーダー探査線
+            mapAngle += 0.02;
+            mapCtx.strokeStyle = 'rgba(38, 159, 251, 0.5)';
+            mapCtx.beginPath();
+            mapCtx.moveTo(cx, cy);
+            mapCtx.lineTo(cx + Math.cos(mapAngle) * 120, cy + Math.sin(mapAngle) * 120);
+            mapCtx.stroke();
+
+            // マップ上のターゲットマーカー（点滅・固定位置）
+            const targets = [
+                {x: cx - 60, y: cy - 30, label: 'JN-108', color: '#e67e22'},
+                {x: cx + 40, y: cy - 50, label: 'JN-137', color: '#269ffb'},
+                {x: cx + 70, y: cy + 40, label: 'CAM-13', color: '#269ffb'},
+                {x: cx - 40, y: cy + 50, label: 'CAM-25', color: 'rgba(38,159,251,0.5)'},
+                {x: cx + 10, y: cy + 10, label: 'PLAZA-01', color: '#e67e22'}
+            ];
+
+            targets.forEach(t => {
+                mapCtx.fillStyle = t.color;
+                mapCtx.beginPath();
+                mapCtx.arc(t.x, t.y, 3, 0, Math.PI * 2);
+                mapCtx.fill();
+
+                mapCtx.font = '7px "Courier New", Courier, monospace';
+                mapCtx.fillStyle = 'rgba(38, 159, 251, 0.8)';
+                mapCtx.fillText(t.label, t.x + 5, t.y + 2);
+            });
+
+            requestAnimationFrame(renderTacticalMap);
+        }
+        renderTacticalMap();
+
 
         // 共通のX軸（時間）描画関数
         function drawXAxis(ctx, width, height, paddingLeft, paddingRight, paddingBottom, paddingTop) {
@@ -710,6 +908,7 @@
             ctx1 = initCanvas(canvas1);
             ctx2 = initCanvas(canvas2);
             ctx3 = initCanvas(canvas3);
+            mapCtx = initCanvas(mapCanvas);
         });
     </script>
 </body>
