@@ -1024,23 +1024,30 @@
             return true;
         };
 
-mapboxgl.accessToken = 'pk.eyJ1IjoibWM1ZHBiYWJnb2d1IiwiYSI6ImNtdWg0NmhhbDAxZ3YzNHBxc2R2d25pZXUifQ.jco9CKcl7GfcSr2Lh79gLA';
-
-        // 確実に表示できるMapbox標準のダークスタイルをデフォルトに設定
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWMxZHBiYWJnb2d1IiwiYSI6ImNtdWg0NmhhbDAxZ3YzNHBxc2R2d25pZXUifQ.jco9CKcl7GfcSr2Lh79gLA';
+        const PRIMARY_STYLE = 'mapbox://styles/mc1dpbabgogu/cmumrim97003901sl30ltg4o2';
         const FALLBACK_STYLE = 'mapbox://styles/mapbox/dark-v11';
 
         let map;
         try {
             map = new mapboxgl.Map({
                 container: 'map',
-                style: FALLBACK_STYLE, // まずは確実に読み込めるスタイルで初期化
+                style: PRIMARY_STYLE,
                 projection: 'mercator',
                 zoom: 14.54,
                 center: [77.2146, 28.6377],
                 bearing: 0.0
             });
         } catch(err) {
-            console.warn('Map initialization failed:', err);
+            console.warn('Map initialization fallback triggered:', err);
+            map = new mapboxgl.Map({
+                container: 'map',
+                style: FALLBACK_STYLE,
+                projection: 'mercator',
+                zoom: 14.54,
+                center: [77.2146, 28.6377],
+                bearing: 0.0
+            });
         }
 
         let styleFallbackAttempted = false;
