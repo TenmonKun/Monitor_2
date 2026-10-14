@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitor_2_X110(1080P)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: #010307;
+            color: #269ffb;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: grid;
+            /* 左半分(723px)と右側(1fr)の2カラムに分割 */
+            grid-template-columns: 723px 1fr;
+            /* ヘッダー(35px)とメインコンテンツエリア */
+            grid-template-rows: 35px 1fr;
+            border: 6px solid #050d1a;
+        }
+
+        /* ヘッダー */
+        header {
+            grid-column: 1 / -1;
+            background-color: #050d1a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            border-bottom: 3px solid #0b1f3b;
+        }
+
+        header .title {
+            color: #79cbff;
+        }
+
+        header .sub-info {
+            font-size: 10px;
+            color: #1765c0;
+        }
+
+        /* パネル共通スタイル */
+        .panel {
+            background-color: rgba(2, 6, 14, 0.95);
+            border: 3px solid #0b1f3b;
+            padding: 10px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .panel-title {
+            font-size: 11px;
+            color: #5aaeff;
+            border-bottom: 2px solid #0b1f3b;
+            padding-bottom: 3px;
+            letter-spacing: 1px;
+        }
+
+        /* プレースホルダー（空ボックス）のスタイル */
+        .placeholder-slot {
+            position: relative;
+            border: 2px solid rgba(38, 159, 251, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(38, 159, 251, 0.4);
+            font-size: 11px;
+            text-align: center;
+        }
+
+        /* 1. 左側エリア（上下に二分割） */
+        .left-section {
+            grid-column: 1;
+            grid-row: 2;
+            border-right: 3px solid #0b1f3b;
+            background: #01040a;
+            height: 100%;
+            display: grid;
+            grid-template-rows: 5fr 1fr;
+            padding: 0;
+        }
+
+        /* 左上エリア */
+        .top-left-section {
+            border-bottom: 3px solid #0b1f3b;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 左下エリア（左右に三分割：1列目・2列目・3列目） */
+        .bottom-left-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        /* 左下エリア内の各カラム */
+        .bottom-left-col {
+            border-right: 2px solid #0b1f3b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(38, 159, 251, 0.4);
+            font-size: 11px;
+            position: relative;
+            overflow: hidden;
+            background-color: rgba(2, 6, 14, 0.95);
+        }
+
+        .bottom-left-col:last-child {
+            border-right: none;
+        }
+
+        /* グラフコンテナとCanvas */
+        .chart-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 8px 10px;
+            gap: 4px;
+        }
+
+        /* DATA PANEL と同じ .panel-title のスタイルを適用 */
+        .chart-header {
+            font-size: 11px;
+            color: #5aaeff;
+            border-bottom: 2px solid #0b1f3b;
+            padding-bottom: 3px;
+            letter-spacing: 1px;
+        }
+
+        .chart-canvas-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-canvas-wrapper canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 右側エリア（上下に二分割） */
+        .right-section {
+            grid-column: 2;
+            grid-row: 2;
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            background: #01040a;
+            height: 100%;
+        }
+
+        /* 2. 右上エリア */
+        .top-right-section {
+            border-bottom: 3px solid #0b1f3b;
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            padding: 0;
+        }
+
+        /* 3. 右下エリア */
+        .bottom-right-section {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            padding: 0;
+        }
+
+        /* 追加したサイドバー風のインナーパネル共通スタイル */
+        .inner-sidebar {
+            background-color: rgba(2, 6, 14, 0.95);
+            border-right: 2px solid #0b1f3b;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+        }
+
+        /* ツリービューとメタデータの縦並びコンテナ */
+        .directories-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sub-box {
+            background: rgba(5, 13, 26, 0.7);
+            border: 1px solid #0b1f3b;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .sub-box-title {
+            font-size: 9px;
+            color: #79cbff;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #1765c0;
+            padding-bottom: 2px;
+        }
+
+        /* ツリービューのスタイル */
+        .tree-view {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .tree-folder {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tree-folder-header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 2px 4px;
+            color: #79cbff;
+            background: rgba(11, 31, 59, 0.3);
+            border-left: 2px solid #1765c0;
+            font-size: 9px;
+        }
+
+        .tree-folder-header:hover {
+            background: rgba(38, 159, 251, 0.15);
+        }
+
+        .tree-children {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding-left: 10px;
+            margin-top: 2px;
+            border-left: 1px dotted rgba(38, 159, 251, 0.3);
+        }
+
+        .tree-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 5px;
+            color: #269ffb;
+            background: rgba(2, 6, 14, 0.6);
+            border: 1px solid transparent;
+            font-size: 9px;
+        }
+
+        /* メタデータ表示スタイル */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3px;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(11, 31, 59, 0.2);
+            padding: 2px 4px;
+            border-left: 2px solid #e67e22;
+            font-size: 8px;
+        }
+
+        .meta-key {
+            color: rgba(38, 159, 251, 0.7);
+        }
+
+        .meta-val {
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        /* 動画表示エリアのスタイル */
+        .video-container {
+            position: relative;
+            background-color: #000103;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bg-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.85;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ヘッダー -->
+    <header>
+        <div class="title">THANATOS-03 &nbsp;&nbsp; <span style="font-size:10px; color:#1765c0;">UNITED STATES SPACE FORCE</span></div>
+        <div class="sub-info">TACTICAL CONSOLE v1.13.8</div>
+    </header>
+
+    <!-- 左半分エリア（上下分割：左上を拡大） -->
+    <div class="left-section">
+        <!-- 左上 -->
+        <div class="placeholder-slot top-left-section">
+            <span>[ TOP LEFT SECTION ]</span>
+        </div>
+        <!-- 左下（左右に三分割） -->
+        <div class="bottom-left-section">
+            <!-- SUB 1 -->
+            <div class="bottom-left-col">
+                <div class="chart-container">
+                    <div class="chart-header">GPS LAT-LONG</div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="sub1Chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- SUB 2 -->
+            <div class="bottom-left-col">
+                <div class="chart-container">
+                    <div class="chart-header">TARGET VELOCITY</div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="sub2Chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- SUB 3 -->
+            <div class="bottom-left-col">
+                <div class="chart-container">
+                    <div class="chart-header">SIGNAL LOCK</div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="sub3Chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右側エリア（上下分割） -->
+    <div class="right-section">
+        <!-- 右上 -->
+        <div class="top-right-section">
+            <div class="inner-sidebar">
+                <div class="panel-title">DATA PANEL</div>
+            </div>
+            <div class="video-container">
+                <video class="bg-video" src="C:\Users\y_ish\Videos\インド映画撮影データ\映像_監視カメラ\S2_04.mp4" autoplay muted loop playsinline></video>
+            </div>
+        </div>
+        <!-- 右下：SYSTEM DIRECTORIES (ツリービューとメタデータを上から順に縦並び配置) -->
+        <div class="bottom-right-section">
+            <div class="inner-sidebar">
+                <div class="panel-title">NETWORK TOPOLOGY</div>
+                
+                <div class="directories-stack">
+                    <!-- 1. TREE SECTION -->
+                    <div class="sub-box">
+                        <div class="sub-box-title">STREAM SOURCE</div>
+                        <div class="tree-view">
+                            <!-- Sector 01 -->
+                            <div class="tree-folder">
+                                <div class="tree-folder-header" onclick="toggleFolder(this)">
+                                    <span>▼</span> <span>DELHI_TRAFFIC_POLICE</span>
+                                </div>
+                                <div class="tree-children">
+                                    <div class="tree-item"><span>[-]</span> JN-108</div>
+                                    <div class="tree-item"><span>[+]</span> JN-137</div>
+                                    <div class="tree-item"><span>[+]</span> JN-159</div>
+                                </div>
+                            </div>
+                            <!-- Sector 02 -->
+                            <div class="tree-folder">
+                                <div class="tree-folder-header" onclick="toggleFolder(this)">
+                                    <span>▼</span> <span>NDMC_SMART_CITY</span>
+                                </div>
+                                <div class="tree-children">
+                                    <div class="tree-item"><span>[-]</span> CAM-13</div>
+                                    <div class="tree-item"><span>[-]</span> CAM-25</div>
+                                </div>
+                            </div>
+                            <!-- Sector 03 -->
+                            <div class="tree-folder">
+                                <div class="tree-folder-header" onclick="toggleFolder(this)">
+                                    <span>▼</span> <span>ROYAL-PLAZA</span>
+                                </div>
+                                <div class="tree-children">
+                                    <div class="tree-item"><span>[-]</span> CAM-01</div>
+                                    <div class="tree-item"><span>[+]</span> CAM-03</div>
+                                </div>
+                            </div>
+                            <!-- Sector 04 -->
+                            <div class="tree-folder">
+                                <div class="tree-folder-header" onclick="toggleFolder(this)">
+                                    <span>▼</span> <span>LEELA_PALACE</span>
+                                </div>
+                                <div class="tree-children">
+                                    <div class="tree-item"><span>[+]</span> CAM_1</div>
+                                    <div class="tree-item"><span>[+]</span> CAM_4</div>
+                                    <div class="tree-item"><span>[-]</span> CAM_5</div>
+                                </div>
+                            </div>
+                            <!-- Sector 05 (IMPERIAL_HERITAGE: 最初からたたんだ状態) -->
+                            <div class="tree-folder">
+                                <div class="tree-folder-header" onclick="toggleFolder(this)">
+                                    <span>▶</span> <span>IMPERIAL_HERITAGE</span>
+                                </div>
+                                <div class="tree-children" style="display: none;">
+                                    <div class="tree-item"><span>[-]</span> CAM-01</div>
+                                    <div class="tree-item"><span>[+]</span> CAM-02</div>
+                                    <div class="tree-item"><span>[+]</span> CAM-03</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. META SECTION -->
+                    <div class="sub-box">
+                        <div class="sub-box-title">META DATA</div>
+                        <div class="meta-grid">
+                            <div class="meta-row"><span class="meta-key">NODE ID</span><span class="meta-val">CAM-01</span></div>
+                            <div class="meta-row"><span class="meta-key">RES</span><span class="meta-val">1920x1080</span></div>
+                            <div class="meta-row"><span class="meta-key">CODEC</span><span class="meta-val">H.265 / 12M</span></div>
+                            <div class="meta-row"><span class="meta-key">SEC-LVL</span><span class="meta-val">ALPHA-1</span></div>
+                            <div class="meta-row"><span class="meta-key">LATENCY</span><span class="meta-val">14 ms</span></div>
+                            <div class="meta-row"><span class="meta-key">STATUS</span><span class="meta-val">ONLINE</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="video-container">
+                <video class="bg-video" src="C:\Users\y_ish\Videos\インド映画撮影データ\映像_監視カメラ\CCTV_S3_1.mp4" autoplay muted loop playsinline></video>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ツリービューのフォルダ開閉処理
+        function toggleFolder(header) {
+            const children = header.nextElementSibling;
+            const arrow = header.querySelector('span:first-child');
+            if (children.style.display === 'none') {
+                children.style.display = 'flex';
+                arrow.textContent = '▼';
+            } else {
+                children.style.display = 'none';
+                arrow.textContent = '▶';
+            }
+        }
+
+        // 共通のCanvasリサイズ関数
+        function initCanvas(canvas) {
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            return ctx;
+        }
+
+        // 共通のX軸（時間）描画関数
+        function drawXAxis(ctx, width, height, paddingLeft, paddingRight, paddingBottom, paddingTop) {
+            const graphWidth = width - paddingLeft - paddingRight;
+            const graphHeight = height - paddingBottom - paddingTop;
+
+            ctx.textAlign = 'center';
+            ctx.font = '7px "Courier New", Courier, monospace';
+            const xSteps = 4;
+            for (let i = 0; i <= xSteps; i++) {
+                const xPos = paddingLeft + (graphWidth / xSteps) * i;
+                ctx.strokeStyle = 'rgba(11, 31, 59, 0.4)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(xPos, paddingTop);
+                ctx.lineTo(xPos, height - paddingBottom);
+                ctx.stroke();
+                ctx.fillStyle = 'rgba(38, 159, 251, 0.5)';
+                ctx.fillText(`0:${(i * 15).toString().padStart(2, '0')}`, xPos, height - 2);
+            }
+            return { graphWidth, graphHeight };
+        }
+
+        // --- [ SUB 1 ] グラフ（緯度: 35.0 〜 35.4） ---
+        const canvas1 = document.getElementById('sub1Chart');
+        let ctx1 = initCanvas(canvas1);
+        let data1 = [];
+        const maxPoints = 20;
+        let val1 = 35.20;
+
+        for (let i = 0; i < maxPoints; i++) {
+            val1 += (Math.random() - 0.5) * 0.04;
+            val1 = Math.max(35.0, Math.min(35.4, val1));
+            data1.push(val1);
+        }
+
+        setInterval(() => {
+            val1 += (Math.random() - 0.49) * 0.05;
+            val1 = Math.max(35.0, Math.min(35.4, val1));
+            data1.shift();
+            data1.push(val1);
+            renderSub1();
+        }, 250);
+
+        function renderSub1() {
+            const w = canvas1.clientWidth, h = canvas1.clientHeight;
+            ctx1.clearRect(0, 0, w, h);
+            const paddingLeft = 34, paddingRight = 8, paddingBottom = 14, paddingTop = 6;
+            const { graphWidth, graphHeight } = drawXAxis(ctx1, w, h, paddingLeft, paddingRight, paddingBottom, paddingTop);
+
+            // Y軸（左軸）のカスタム描画
+            ctx1.textAlign = 'right';
+            ctx1.strokeStyle = 'rgba(11, 31, 59, 0.8)';
+            const ySteps = 3;
+            for (let i = 0; i <= ySteps; i++) {
+                const yVal = (35.4 - (0.4 / ySteps) * i).toFixed(2);
+                const yPos = paddingTop + (graphHeight / ySteps) * i;
+                ctx1.beginPath();
+                ctx1.moveTo(paddingLeft, yPos);
+                ctx1.lineTo(w - paddingRight, yPos);
+                ctx1.stroke();
+                ctx1.fillStyle = 'rgba(38, 159, 251, 0.5)';
+                ctx1.fillText(yVal, paddingLeft - 3, yPos + 3);
+            }
+
+            const getX = i => paddingLeft + (i / (maxPoints - 1)) * graphWidth;
+            const getY = val => paddingTop + graphHeight - ((val - 35.0) / 0.4) * graphHeight;
+
+            const grad = ctx1.createLinearGradient(0, paddingTop, 0, paddingTop + graphHeight);
+            grad.addColorStop(0, 'rgba(230, 126, 34, 0.35)');
+            grad.addColorStop(1, 'rgba(230, 126, 34, 0.02)');
+
+            ctx1.beginPath();
+            ctx1.moveTo(getX(0), paddingTop + graphHeight);
+            for (let i = 0; i < data1.length; i++) ctx1.lineTo(getX(i), getY(data1[i]));
+            ctx1.lineTo(getX(data1.length - 1), paddingTop + graphHeight);
+            ctx1.closePath();
+            ctx1.fillStyle = grad;
+            ctx1.fill();
+
+            ctx1.beginPath();
+            for (let i = 0; i < data1.length; i++) {
+                const x = getX(i), y = getY(data1[i]);
+                if (i === 0) ctx1.moveTo(x, y); else ctx1.lineTo(x, y);
+            }
+            ctx1.strokeStyle = '#e67e22';
+            ctx1.lineWidth = 1.5;
+            ctx1.stroke();
+        }
+
+        // --- [ SUB 2 ] グラフ（速度: 0 〜 1200 km/h） ---
+        const canvas2 = document.getElementById('sub2Chart');
+        let ctx2 = initCanvas(canvas2);
+        let data2 = [];
+        let val2 = 450;
+
+        for (let i = 0; i < maxPoints; i++) {
+            val2 = Math.random() > 0.7 ? Math.random() * 900 + 100 : Math.random() * 300 + 100;
+            data2.push(val2);
+        }
+
+        setInterval(() => {
+            val2 = Math.random() > 0.65 ? Math.random() * 1000 + 100 : Math.random() * 250 + 100;
+            data2.shift();
+            data2.push(val2);
+            renderSub2();
+        }, 200);
+
+        function renderSub2() {
+            const w = canvas2.clientWidth, h = canvas2.clientHeight;
+            ctx2.clearRect(0, 0, w, h);
+            const paddingLeft = 32, paddingRight = 8, paddingBottom = 14, paddingTop = 6;
+            const { graphWidth, graphHeight } = drawXAxis(ctx2, w, h, paddingLeft, paddingRight, paddingBottom, paddingTop);
+
+            // Y軸（左軸）のカスタム描画
+            ctx2.textAlign = 'right';
+            ctx2.strokeStyle = 'rgba(11, 31, 59, 0.8)';
+            const ySteps = 3;
+            for (let i = 0; i <= ySteps; i++) {
+                const yVal = Math.round(1200 - (1200 / ySteps) * i);
+                const yPos = paddingTop + (graphHeight / ySteps) * i;
+                ctx2.beginPath();
+                ctx2.moveTo(paddingLeft, yPos);
+                ctx2.lineTo(w - paddingRight, yPos);
+                ctx2.stroke();
+                ctx2.fillStyle = 'rgba(38, 159, 251, 0.5)';
+                ctx2.fillText(yVal, paddingLeft - 3, yPos + 3);
+            }
+
+            const getX = i => paddingLeft + (i / (maxPoints - 1)) * graphWidth;
+            const getY = val => paddingTop + graphHeight - (val / 1200) * graphHeight;
+
+            const grad = ctx2.createLinearGradient(0, paddingTop, 0, paddingTop + graphHeight);
+            grad.addColorStop(0, 'rgba(230, 126, 34, 0.35)');
+            grad.addColorStop(1, 'rgba(230, 126, 34, 0.02)');
+
+            ctx2.beginPath();
+            ctx2.moveTo(getX(0), paddingTop + graphHeight);
+            for (let i = 0; i < data2.length; i++) ctx2.lineTo(getX(i), getY(data2[i]));
+            ctx2.lineTo(getX(data2.length - 1), paddingTop + graphHeight);
+            ctx2.closePath();
+            ctx2.fillStyle = grad;
+            ctx2.fill();
+
+            ctx2.beginPath();
+            for (let i = 0; i < data2.length; i++) {
+                const x = getX(i), y = getY(data2[i]);
+                if (i === 0) ctx2.moveTo(x, y); else ctx2.lineTo(x, y);
+            }
+            ctx2.strokeStyle = '#e67e22';
+            ctx2.lineWidth = 1.5;
+            ctx2.stroke();
+        }
+
+        // --- [ SUB 3 ] グラフ（信号強度: -120 〜 -20 dBm） ---
+        const canvas3 = document.getElementById('sub3Chart');
+        let ctx3 = initCanvas(canvas3);
+        let data3 = [];
+        let val3 = -70;
+
+        for (let i = 0; i < maxPoints; i++) {
+            val3 += (Math.random() - 0.5) * 15;
+            val3 = Math.max(-115, Math.min(-25, val3));
+            data3.push(val3);
+        }
+
+        setInterval(() => {
+            val3 += (Math.random() - 0.52) * 20;
+            val3 = Math.max(-118, Math.min(-22, val3));
+            data3.shift();
+            data3.push(val3);
+            renderSub3();
+        }, 150);
+
+        function renderSub3() {
+            const w = canvas3.clientWidth, h = canvas3.clientHeight;
+            ctx3.clearRect(0, 0, w, h);
+            const paddingLeft = 34, paddingRight = 8, paddingBottom = 14, paddingTop = 6;
+            const { graphWidth, graphHeight } = drawXAxis(ctx3, w, h, paddingLeft, paddingRight, paddingBottom, paddingTop);
+
+            // Y軸（左軸）のカスタム描画 (-20 〜 -120)
+            ctx3.textAlign = 'right';
+            ctx3.strokeStyle = 'rgba(11, 31, 59, 0.8)';
+            const ySteps = 3;
+            for (let i = 0; i <= ySteps; i++) {
+                const yVal = Math.round(-20 - (100 / ySteps) * i);
+                const yPos = paddingTop + (graphHeight / ySteps) * i;
+                ctx3.beginPath();
+                ctx3.moveTo(paddingLeft, yPos);
+                ctx3.lineTo(w - paddingRight, yPos);
+                ctx3.stroke();
+                ctx3.fillStyle = 'rgba(38, 159, 251, 0.5)';
+                ctx3.fillText(yVal, paddingLeft - 3, yPos + 3);
+            }
+
+            const getX = i => paddingLeft + (i / (maxPoints - 1)) * graphWidth;
+            const getY = val => paddingTop + graphHeight - ((val - (-120)) / 100) * graphHeight;
+
+            const grad = ctx3.createLinearGradient(0, paddingTop, 0, paddingTop + graphHeight);
+            grad.addColorStop(0, 'rgba(230, 126, 34, 0.35)');
+            grad.addColorStop(1, 'rgba(230, 126, 34, 0.02)');
+
+            ctx3.beginPath();
+            ctx3.moveTo(getX(0), paddingTop + graphHeight);
+            for (let i = 0; i < data3.length; i++) ctx3.lineTo(getX(i), getY(data3[i]));
+            ctx3.lineTo(getX(data3.length - 1), paddingTop + graphHeight);
+            ctx3.closePath();
+            ctx3.fillStyle = grad;
+            ctx3.fill();
+
+            ctx3.beginPath();
+            for (let i = 0; i < data3.length; i++) {
+                const x = getX(i), y = getY(data3[i]);
+                if (i === 0) ctx3.moveTo(x, y); else ctx3.lineTo(x, y);
+            }
+            ctx3.strokeStyle = '#e67e22';
+            ctx3.lineWidth = 1.5;
+            ctx3.stroke();
+        }
+
+        // 初期描画の実行
+        renderSub1();
+        renderSub2();
+        renderSub3();
+
+        window.addEventListener('resize', () => {
+            ctx1 = initCanvas(canvas1);
+            ctx2 = initCanvas(canvas2);
+            ctx3 = initCanvas(canvas3);
+        });
+    </script>
+</body>
+</html>
