@@ -140,7 +140,6 @@
             gap: 4px;
         }
 
-        /* DATA PANEL と同じ .panel-title のスタイルを適用 */
         .chart-header {
             font-size: 11px;
             color: #5aaeff;
@@ -199,7 +198,6 @@
             overflow-y: auto;
         }
 
-        /* ツリービューとメタデータの縦並びコンテナ */
         .directories-stack {
             display: flex;
             flex-direction: column;
@@ -223,7 +221,6 @@
             padding-bottom: 2px;
         }
 
-        /* ツリービューのスタイル */
         .tree-view {
             display: flex;
             flex-direction: column;
@@ -271,7 +268,6 @@
             font-size: 9px;
         }
 
-        /* メタデータ表示スタイル */
         .meta-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -296,7 +292,6 @@
             font-weight: bold;
         }
 
-        /* 動画表示エリアのスタイル */
         .video-container {
             position: relative;
             background-color: #000103;
@@ -428,18 +423,27 @@
           text-shadow: 0 0 8px var(--neon-red-glow), 0 0 12px var(--neon-red);
         }
 
-        .top-left-section .hud-bottom-center {
+        .top-left-section .hud-bottom-right {
           bottom: 10px;
-          left: 50%;
-          transform: translateX(-50%);
+          right: 10px;
           display: flex;
-          gap: 15px;
-          text-align: center;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 10px;
+          text-align: right;
+        }
+
+        .top-left-section .coord-container {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          align-items: flex-end;
         }
 
         .top-left-section .coord-box {
           display: flex;
           flex-direction: column;
+          align-items: flex-end;
         }
 
         .top-left-section .coord-label {
@@ -470,14 +474,8 @@
           bottom: 10px;
           left: 10px;
           text-shadow: 0 0 5px #000;
-        }
-
-        .top-left-section .hud-bottom-right {
-          bottom: 10px;
-          right: 10px;
           display: flex;
           flex-direction: column;
-          align-items: flex-end;
           gap: 6px;
         }
 
@@ -556,30 +554,6 @@
           margin-top: 3px;
         }
 
-        .top-left-section .cyber-btn {
-          background: transparent;
-          border: none;
-          color: var(--neon-red);
-          font-family: 'Share Tech Mono', monospace;
-          font-size: 10px;
-          padding: 3px 6px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          text-transform: uppercase;
-          display: flex;
-          gap: 6px;
-          text-shadow: 0 0 6px var(--neon-red-glow);
-        }
-
-        .top-left-section .cyber-btn:hover {
-          color: #fff;
-          text-shadow: 0 0 10px var(--neon-cyan), 0 0 15px var(--neon-cyan);
-        }
-
-        .top-left-section .cyber-btn:active {
-          transform: scale(0.95);
-        }
-
         .glow-red { color: var(--neon-red); text-shadow: 0 0 6px var(--neon-red-glow), 0 0 2px #000; }
         .glow-cyan { color: var(--neon-cyan); text-shadow: 0 0 6px var(--neon-cyan-glow), 0 0 2px #000; }
         .glow-green { color: var(--neon-green); text-shadow: 0 0 6px var(--neon-green-glow), 0 0 2px #000; }
@@ -615,12 +589,13 @@
 
                 <!-- TOP CENTER PANEL -->
                 <div class="hud-element hud-top-center">
-                  <span class="title-text">ORAD TACTICAL OVERLAY v4.8</span>
+                  <span class="classified-tag">RESTRICTED</span>
+                  <!-- ORAD TACTICAL OVERLAY v4. を削除しました -->
                 </div>
 
                 <!-- TOP LEFT PANEL -->
                 <div class="hud-element hud-top-left">
-                  <!-- TARGET TRACKING PROTOCOL 0.9 を削除しました -->
+                  <div class="glow-red" style="font-size: 9px; margin-top: 2px;">TARGET TRACKING PROTOCOL 0.9.4</div>
                 </div>
 
                 <!-- TOP RIGHT PANEL -->
@@ -638,18 +613,8 @@
                   </div>
                 </div>
 
-                <!-- BOTTOM LEFT PANEL -->
+                <!-- BOTTOM LEFT PANEL (円のレーダーをSATELLITE LINKの上に配置) -->
                 <div class="hud-element hud-bottom-left">
-                  <div style="line-height: 1.4; font-size: 10px;">
-                    <div style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; margin-top: 2px;">SATELLITE LINK: ACTIVE <span style="font-size: 8px; opacity: 0.8;">(12ms)</span></div>
-                    <div class="glow-red">ENCRYPTION: <span style="color: #fff; text-shadow: 0 0 6px #fff;">AES-256-GCM</span></div>
-                    <div class="glow-red">PACKETS TRACED: <span id="packetCount" style="color: #fff; text-shadow: 0 0 6px #fff;">184,920</span></div>
-                    <div style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; margin-top: 2px;">HOST: 192.168.0.104 // PORT: 8080</div>
-                  </div>
-                </div>
-
-                <!-- BOTTOM RIGHT PANEL -->
-                <div class="hud-element hud-bottom-right">
                   <div class="radar-container">
                     <div class="radar-sweep"></div>
                     <div class="radar-grid"></div>
@@ -658,27 +623,34 @@
                     <div class="radar-blip" style="top: 20px; left: 45px;"></div>
                     <div class="radar-blip" style="top: 50px; left: 25px; animation-delay: 0.5s;"></div>
                   </div>
-                  
-                  <!-- ping location ボタンを削除しました -->
+
+                  <div style="line-height: 1.4; font-size: 10px;">
+                    <div style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; margin-top: 2px;">SATELLITE LINK: ACTIVE <span style="font-size: 8px; opacity: 0.8;">(12ms)</span></div>
+                    <div class="glow-red">ENCRYPTION: <span style="color: #fff; text-shadow: 0 0 6px #fff;">AES-256-GCM</span></div>
+                    <div class="glow-red">PACKETS TRACED: <span id="packetCount" style="color: #fff; text-shadow: 0 0 6px #fff;">184,920</span></div>
+                    <div style="font-size: 9px; color: #888; text-shadow: 0 0 4px #000; margin-top: 2px;">HOST: 192.168.0.104 // PORT: 8080</div>
+                  </div>
                 </div>
 
-                <!-- BOTTOM CENTER PANEL -->
-                <div class="hud-element hud-bottom-center">
-                  <div class="coord-box">
-                    <span class="coord-label">LATITUDE</span>
-                    <span class="coord-val" id="telemetryLat">28.6394</span>
-                  </div>
-                  <div class="coord-box">
-                    <span class="coord-label">LONGITUDE</span>
-                    <span class="coord-val" id="telemetryLng">77.2141</span>
-                  </div>
-                  <div class="coord-box">
-                    <span class="coord-label">ZOOM LEVEL</span>
-                    <span class="coord-val" id="telemetryZoom">13.26</span>
-                  </div>
-                  <div class="coord-box">
-                    <span class="coord-label">BEARING</span>
-                    <span class="coord-val" id="telemetryBearing">0.0°</span>
+                <!-- BOTTOM RIGHT PANEL (座標情報を右下に移動) -->
+                <div class="hud-element hud-bottom-right">
+                  <div class="coord-container">
+                    <div class="coord-box">
+                      <span class="coord-label">LATITUDE</span>
+                      <span class="coord-val" id="telemetryLat">28.6377</span>
+                    </div>
+                    <div class="coord-box">
+                      <span class="coord-label">LONGITUDE</span>
+                      <span class="coord-val" id="telemetryLng">77.2146</span>
+                    </div>
+                    <div class="coord-box">
+                      <span class="coord-label">ZOOM LEVEL</span>
+                      <span class="coord-val" id="telemetryZoom">14.54</span>
+                    </div>
+                    <div class="coord-box">
+                      <span class="coord-label">BEARING</span>
+                      <span class="coord-val" id="telemetryBearing">0.0°</span>
+                    </div>
                   </div>
                 </div>
             </div>
@@ -727,7 +699,7 @@
                 <video class="bg-video" src="C:\Users\y_ish\Videos\インド映画撮影データ\映像_監視カメラ\S2_04.mp4" autoplay muted loop playsinline></video>
             </div>
         </div>
-        <!-- 右下：SYSTEM DIRECTORIES (ツリービューとメタデータを上から順に縦並び配置) -->
+        <!-- 右下：SYSTEM DIRECTORIES -->
         <div class="bottom-right-section">
             <div class="inner-sidebar">
                 <div class="panel-title">NETWORK TOPOLOGY</div>
@@ -779,7 +751,7 @@
                                     <div class="tree-item"><span>[-]</span> CAM_5</div>
                                 </div>
                             </div>
-                            <!-- Sector 05 (IMPERIAL_HERITAGE: 最初からたたんだ状態) -->
+                            <!-- Sector 05 -->
                             <div class="tree-folder">
                                 <div class="tree-folder-header" onclick="toggleFolder(this)">
                                     <span>▶</span> <span>IMPERIAL_HERITAGE</span>
@@ -814,7 +786,6 @@
     </div>
 
     <script>
-        // ツリービューのフォルダ開閉処理
         function toggleFolder(header) {
             const children = header.nextElementSibling;
             const arrow = header.querySelector('span:first-child');
@@ -827,7 +798,6 @@
             }
         }
 
-        // 共通のCanvasリサイズ関数
         function initCanvas(canvas) {
             const ctx = canvas.getContext('2d');
             const rect = canvas.parentElement.getBoundingClientRect();
@@ -837,7 +807,6 @@
             return ctx;
         }
 
-        // 共通のX軸（時間）描画関数
         function drawXAxis(ctx, width, height, paddingLeft, paddingRight, paddingBottom, paddingTop) {
             const graphWidth = width - paddingLeft - paddingRight;
             const graphHeight = height - paddingBottom - paddingTop;
@@ -859,7 +828,7 @@
             return { graphWidth, graphHeight };
         }
 
-        // --- [ SUB 1 ] グラフ（緯度: 35.0 〜 35.4） ---
+        // --- [ SUB 1 ] ---
         const canvas1 = document.getElementById('sub1Chart');
         let ctx1 = initCanvas(canvas1);
         let data1 = [];
@@ -886,7 +855,6 @@
             const paddingLeft = 34, paddingRight = 8, paddingBottom = 14, paddingTop = 6;
             const { graphWidth, graphHeight } = drawXAxis(ctx1, w, h, paddingLeft, paddingRight, paddingBottom, paddingTop);
 
-            // Y軸（左軸）のカスタム描画
             ctx1.textAlign = 'right';
             ctx1.strokeStyle = 'rgba(11, 31, 59, 0.8)';
             const ySteps = 3;
@@ -926,7 +894,7 @@
             ctx1.stroke();
         }
 
-        // --- [ SUB 2 ] グラフ（速度: 0 〜 1200 km/h） ---
+        // --- [ SUB 2 ] ---
         const canvas2 = document.getElementById('sub2Chart');
         let ctx2 = initCanvas(canvas2);
         let data2 = [];
@@ -950,7 +918,6 @@
             const paddingLeft = 32, paddingRight = 8, paddingBottom = 14, paddingTop = 6;
             const { graphWidth, graphHeight } = drawXAxis(ctx2, w, h, paddingLeft, paddingRight, paddingBottom, paddingTop);
 
-            // Y軸（左軸）のカスタム描画
             ctx2.textAlign = 'right';
             ctx2.strokeStyle = 'rgba(11, 31, 59, 0.8)';
             const ySteps = 3;
@@ -990,7 +957,7 @@
             ctx2.stroke();
         }
 
-        // --- [ SUB 3 ] グラフ（信号強度: -120 〜 -20 dBm） ---
+        // --- [ SUB 3 ] ---
         const canvas3 = document.getElementById('sub3Chart');
         let ctx3 = initCanvas(canvas3);
         let data3 = [];
@@ -1016,7 +983,6 @@
             const paddingLeft = 34, paddingRight = 8, paddingBottom = 14, paddingTop = 6;
             const { graphWidth, graphHeight } = drawXAxis(ctx3, w, h, paddingLeft, paddingRight, paddingBottom, paddingTop);
 
-            // Y軸（左軸）のカスタム描画 (-20 〜 -120)
             ctx3.textAlign = 'right';
             ctx3.strokeStyle = 'rgba(11, 31, 59, 0.8)';
             const ySteps = 3;
@@ -1056,7 +1022,6 @@
             ctx3.stroke();
         }
 
-        // 初期描画の実行
         renderSub1();
         renderSub2();
         renderSub3();
@@ -1068,7 +1033,6 @@
         });
     </script>
 
-    <!-- index.html のマップ・HUD制御スクリプト -->
     <script>
         window.onerror = function(msg, url, lineNo, columnNo, error) {
             console.warn('Suppressed script error:', msg);
@@ -1086,8 +1050,8 @@
                 container: 'map',
                 style: PRIMARY_STYLE,
                 projection: 'mercator',
-                zoom: 13.26,
-                center: [77.2141, 28.6394],
+                zoom: 14.54,
+                center: [77.2146, 28.6377],
                 bearing: 0.0
             });
         } catch(err) {
@@ -1096,8 +1060,8 @@
                 container: 'map',
                 style: FALLBACK_STYLE,
                 projection: 'mercator',
-                zoom: 13.26,
-                center: [77.2141, 28.6394],
+                zoom: 14.54,
+                center: [77.2146, 28.6377],
                 bearing: 0.0
             });
         }
@@ -1191,7 +1155,7 @@
             applyCustomStyles();
             if (directions) {
                 try {
-                    directions.setOrigin([77.2141, 28.6394]);
+                    directions.setOrigin([77.2146, 28.6377]);
                     directions.setDestination([77.2300, 28.6500]);
                 } catch(e) {}
             }
@@ -1242,15 +1206,6 @@
             packetCount += Math.floor(Math.random() * 15) + 1;
             document.getElementById('packetCount').innerText = packetCount.toLocaleString();
         }, 500);
-
-        function pingLocation() {
-            const center = map.getCenter();
-            map.flyTo({
-                center: [center.lng + (Math.random() - 0.5) * 0.02, center.lat + (Math.random() - 0.5) * 0.02],
-                zoom: map.getZoom(),
-                speed: 0.8
-            });
-        }
     </script>
 </body>
 </html>
