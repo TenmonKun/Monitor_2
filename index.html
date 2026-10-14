@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Monitor_2_X110(1080P)</title>
+    <!-- Mapbox GL JS CSS の読み込み -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
     <style>
         * {
             box-sizing: border-box;
@@ -68,18 +70,6 @@
             letter-spacing: 1px;
         }
 
-        /* プレースホルダー（空ボックス）のスタイル */
-        .placeholder-slot {
-            position: relative;
-            border: 2px solid rgba(38, 159, 251, 0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(38, 159, 251, 0.4);
-            font-size: 11px;
-            text-align: center;
-        }
-
         /* 1. 左側エリア（上下に二分割） */
         .left-section {
             grid-column: 1;
@@ -117,15 +107,8 @@
             margin-top: 4px;
         }
 
-        .tactical-map-wrapper {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .tactical-map-wrapper canvas {
+        /* Mapboxを挿入するdiv要素 */
+        #mapboxContainer {
             position: absolute;
             top: 0;
             left: 0;
@@ -184,7 +167,6 @@
             gap: 4px;
         }
 
-        /* DATA PANEL と同じ .panel-title のスタイルを適用 */
         .chart-header {
             font-size: 11px;
             color: #5aaeff;
@@ -374,14 +356,12 @@
 
     <!-- 左半分エリア（上下分割：左上を拡大） -->
     <div class="left-section">
-        <!-- 左上：タクティカルマップ（単体表示） -->
+        <!-- 左上：Mapbox地図組み込みエリア -->
         <div class="top-left-section">
-            <div class="panel-title">TACTICAL MAP</div>
+            <div class="panel-title">TACTICAL MAP (MAPBOX)</div>
             <div class="map-only-container">
                 <div class="map-overlay-info">SECTOR: 28-ALPHA / GRID-09</div>
-                <div class="tactical-map-wrapper">
-                    <canvas id="tacticalMapCanvas"></canvas>
-                </div>
+                <div id="mapboxContainer"></div>
             </div>
         </div>
         <!-- 左下（左右に三分割） -->
@@ -476,7 +456,7 @@
                                 <div class="tree-children">
                                     <div class="tree-item"><span>[+]</span> CAM_1</div>
                                     <div class="tree-item"><span>[+]</span> CAM_4</div>
-                                    <div class="tree-item"><span>[-]</span> CAM-5</div>
+                                    <div class="tree-item"><span>[-]</span> CAM_5</div>
                                 </div>
                             </div>
                             <!-- Sector 05 -->
@@ -513,6 +493,8 @@
         </div>
     </div>
 
+    <!-- Mapbox GL JS の読み込み -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
     <script>
         // ツリービューのフォルダ開閉処理
         function toggleFolder(header) {
@@ -527,6 +509,18 @@
             }
         }
 
+        // --- [ MAPBOX INITIALIZATION ] ---
+        // ※ 'YOUR_MAPBOX_ACCESS_TOKEN' ご自身のMapboxアクセストークンに書き換えてください
+        mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
+
+        const map = new mapboxgl.Map({
+            container: 'mapboxContainer', // 描画先の要素ID
+            style: 'mapbox://styles/mapbox/dark-v11', // ダーク調のタクティカルなスタイル
+            center: [77.2090, 28.6139], // 初期中心座標（例: デリー）
+            zoom: 12, // ズームレベル
+            attributionControl: false // クレジット表示の非表示（必要に応じて調整）
+        });
+
         // 共通のCanvasリサイズ関数
         function initCanvas(canvas) {
             const ctx = canvas.getContext('2d');
@@ -536,47 +530,6 @@
             ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
             return ctx;
         }
-
-        // --- [ TACTICAL MAP ] 簡易マップのアニメーション描画（点なし版） ---
-        const mapCanvas = document.getElementById('tacticalMapCanvas');
-        let mapCtx = initCanvas(mapCanvas);
-        let mapAngle = 0;
-
-        function renderTacticalMap() {
-            const w = mapCanvas.clientWidth, h = mapCanvas.clientHeight;
-            mapCtx.clearRect(0, 0, w, h);
-
-            // グリッド線の描画
-            mapCtx.strokeStyle = 'rgba(38, 159, 251, 0.1)';
-            mapCtx.lineWidth = 1;
-            const step = 30;
-            for (let x = 0; x < w; x += step) {
-                mapCtx.beginPath(); mapCtx.moveTo(x, 0); mapCtx.lineTo(x, h); mapCtx.stroke();
-            }
-            for (let y = 0; y < h; y += step) {
-                mapCtx.beginPath(); mapCtx.moveTo(0, y); mapCtx.lineTo(w, y); mapCtx.stroke();
-            }
-
-            // 同心円
-            const cx = w / 2, cy = h / 2;
-            mapCtx.strokeStyle = 'rgba(38, 159, 251, 0.25)';
-            mapCtx.beginPath();
-            mapCtx.arc(cx, cy, 50, 0, Math.PI * 2);
-            mapCtx.arc(cx, cy, 90, 0, Math.PI * 2);
-            mapCtx.stroke();
-
-            // 回転するレーダー探査線
-            mapAngle += 0.02;
-            mapCtx.strokeStyle = 'rgba(38, 159, 251, 0.5)';
-            mapCtx.beginPath();
-            mapCtx.moveTo(cx, cy);
-            mapCtx.lineTo(cx + Math.cos(mapAngle) * 120, cy + Math.sin(mapAngle) * 120);
-            mapCtx.stroke();
-
-            requestAnimationFrame(renderTacticalMap);
-        }
-        renderTacticalMap();
-
 
         // 共通のX軸（時間）描画関数
         function drawXAxis(ctx, width, height, paddingLeft, paddingRight, paddingBottom, paddingTop) {
@@ -806,7 +759,7 @@
             ctx1 = initCanvas(canvas1);
             ctx2 = initCanvas(canvas2);
             ctx3 = initCanvas(canvas3);
-            mapCtx = initCanvas(mapCanvas);
+            map.resize(); // ウィンドウサイズ変更時にMapboxのレイアウトを再計算
         });
     </script>
 </body>
