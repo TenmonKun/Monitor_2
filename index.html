@@ -68,6 +68,29 @@
             letter-spacing: 1px;
         }
 
+        /* データリスト用スタイル */
+        .data-list {
+            font-size: 10px;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .data-value {
+            color: #79cbff;
+        }
+
+        .status-active {
+            color: #269ffb;
+            font-weight: bold;
+        }
+
         /* プレースホルダー（空ボックス）のスタイル */
         .placeholder-slot {
             position: relative;
@@ -678,8 +701,29 @@
         <!-- 右上 -->
         <div class="top-right-section">
             <div class="inner-sidebar">
-                <div class="panel-title">DATA PANEL</div>
+                <div class="panel-title">METADATA</div>
+                <div class="data-list" style="margin-top: 4px;">
+                    <div class="data-row"><span>STATUS:</span><span class="status-active">ONLINE</span></div>
+                    <div class="data-row"><span>UNIT ID:</span><span class="data-value">X89BC1138K</span></div>
+                    <div class="data-row"><span>OFFICER:</span><span class="data-value">NULL</span></div>
+                    <div class="data-row"><span>BATTERY:</span><span class="data-value">98.2 %</span></div>
+                    <div class="data-row"><span>STORAGE:</span><span class="data-value">53.98 GB</span></div>
+                    <div class="data-row"><span>DEVICE TEMP:</span><span class="data-value" id="dynamicTemp">38.4 °C</span></div>
+                </div>
             </div>
+            <script>
+                // 時間（または一定間隔）によって温度をリアルタイムに変動させるスクリプト
+                let currentTemp = 38.4;
+                setInterval(() => {
+                    // -0.1 ~ +0.1 の間でランダムに微変動させつつ、31.5℃〜33.5℃の範囲内に収める
+                    currentTemp += (Math.random() - 0.5) * 0.2;
+                    currentTemp = Math.max(37.5, Math.min(39.5, currentTemp));
+                    const tempElement = document.getElementById('dynamicTemp');
+                    if (tempElement) {
+                        tempElement.innerText = currentTemp.toFixed(1) + ' °C';
+                    }
+                }, 2000);
+            </script>
             <div class="video-container">
                 <video class="bg-video" src="C:\Users\y_ish\Videos\インド映画撮影データ\映像_監視カメラ\S2_04.mp4" autoplay muted loop playsinline></video>
             </div>
